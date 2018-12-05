@@ -21,8 +21,19 @@ window.onload = function(event) {
     var checkSignupPwd = document.getElementById('check-signup-pwd');
     var checkSignupRePwd = document.getElementById('check-signup-re-pwd');
     var srvResponse = document.getElementById('srv-response');
+    var msgModalBackdrop = document.getElementById('msg-modal-backdrop');
+    var msgModal = document.getElementById('msg-modal');
+    var msgModalTitle = document.getElementById('msg-modal-title');
+    var msgModalBody = document.getElementById('msg-modal-body');
+    var loginEmailInput = document.getElementById('login-email-input');
+    var loginPwdInput = document.getElementById('login-pwd-input');
+    var rememberMe = document.getElementById('remember-me');
+    var loginSrvResponse = document.getElementById('login-srv-response');
+    var notLoggedIn = document.getElementById('not-logged-in');
+    var loggedIn = document.getElementById('logged-in');
 
-    var chatSocket = new WebSocket('ws://localhost:8080/chat');
+    var chatSocket;
+
 
     // who = 0 => My own message
     // who = 1 => Others message
@@ -47,7 +58,7 @@ window.onload = function(event) {
                 successCB && successCB(this.response);
             }
             if (this.readyState === XMLHttpRequest.DONE && this.status !== 200) {
-                errorCB && errorCB(this.statusText);
+                errorCB && errorCB(this.response);
             }
         }
         var strData = Object.entries(data).reduce(function(str, arr) {
@@ -57,20 +68,158 @@ window.onload = function(event) {
         
         xhr.send(encodeURI(strData.slice(0, -1)));
     }
+    
+    function get(url, successCB, errorCB) {
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", url, true);
+        xhr.onreadystatechange = function(ev) {
+            if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
+                successCB && successCB(this.response);
+            }
+            if (this.readyState === XMLHttpRequest.DONE && this.status !== 200) {
+                errorCB && errorCB(this.response);
+            }
+        }
+        
+        xhr.send();
+    }
 
-    chatSocket.onopen = function(event) {
-        console.log("OPEN", event);
+    function prepend(el, htmlContent) {
+        var tmpEl = document.createElement('div');
+        tmpEl.innerHTML = htmlContent.trim();
+        var elToInsert = tmpEl.firstChild;
+        el.insertBefore(elToInsert, el.firstElementChild);
     }
-    chatSocket.onmessage = function(event) {
-        newMessage(event.data, 1);
-        console.log("MESSAGE", event);
+    function append(el, htmlContent) {
+        var tmpEl = document.createElement('div');
+        tmpEl.innerHTML = htmlContent.trim();
+        var elToInsert = tmpEl.firstChild;
+        el.insertBefore(elToInsert);
     }
-    chatSocket.onclose = function(event) {
-        console.log("CLOSE", event);
+    function before(el, htmlContent) {
+        var tmpEl = document.createElement('div');
+        tmpEl.innerHTML = htmlContent.trim();
+        var elToInsert = tmpEl.firstChild;
+        el.parentElement.insertBefore(elToInsert, el);
     }
-    chatSocket.onerror = function(event) {
-        console.log("ERROR", event);
+    function after(el, htmlContent) {
+        var tmpEl = document.createElement('div');
+        tmpEl.innerHTML = htmlContent.trim();
+        var elToInsert = tmpEl.firstChild;
+        el.parentElement.insertBefore(elToInsert, el.nextElementSibling);
     }
+
+    function nrOfMatches(str) {
+        var n = 0;
+        if (lowerCaseRE.test(str)) ++n;
+        if (upperCaseRE.test(str)) ++n;
+        if (digitsRE.test(str)) ++n;
+        if (symbolsRE.test(str)) ++n;
+        return n;
+    }
+
+    function checkPwd() {
+        var val = signupPwdInput.value;
+        if (val.length === 0) {
+            pwdErr = true;
+            checkSignupPwd.className = "hide";
+            return;
+        }
+        if (val.length <= 5 || nrOfMatches(val) <= 1) { // weak
+            pwdErr = true;
+            checkSignupPwd.firstElementChild.innerHTML = "Weak password";
+            checkSignupPwd.className = "pwd-secure weak";
+        } else if (val.length <= 8 || nrOfMatches(val) <= 2) { // medium
+            pwdErr = false;
+            checkSignupPwd.firstElementChild.innerHTML = "Medium password";
+            checkSignupPwd.className = "pwd-secure medium";
+        } else if (val.length < 10 || nrOfMatches(val) <= 3) { // good
+            pwdErr = false;
+            checkSignupPwd.firstElementChild.innerHTML = "Good password";
+            checkSignupPwd.className = "pwd-secure good";
+        } else { // strong
+            pwdErr = false;
+            checkSignupPwd.firstElementChild.innerHTML = "Strong password";
+            checkSignupPwd.className = "pwd-secure strong";
+        }
+    }
+
+    function checkMatchPwd() {
+        var pwd1 = signupPwdInput.value,
+            pwd2 = rePwdInput.value
+        ;
+        if (pwd2.length === 0) {
+            pwdMatchErr = true;
+            checkSignupRePwd.className = "hide";
+            return;
+        }
+        if (pwd1 !== pwd2) {
+            pwdMatchErr = true;
+            checkSignupRePwd.innerHTML = "Passwords don't match"
+            checkSignupRePwd.className = "danger"
+        } else {
+            pwdMatchErr = false;
+            checkSignupRePwd.innerHTML = "";
+            checkSignupRePwd.className = "";
+        }
+    }
+
+    function login() {
+        msgModal.className = "hide";
+        notLoggedIn.className = "hide";
+        loggedIn.className = "logged-in";
+        chatSocket = new WebSocket('ws://localhost:8080/chat');
+        chatSocket.onopen = function(event) {
+            console.log("OPEN", event);
+        }
+        chatSocket.onmessage = function(event) {
+            newMessage(event.data, 1);
+            console.log("MESSAGE", event);
+        }
+        chatSocket.onclose = function(event) {
+            console.log("CLOSE", event);
+        }
+        chatSocket.onerror = function(event) {
+            console.log("ERROR", event);
+        }
+    }
+
+
+    msgModalBackdrop.onclick = function() {
+        msgModal.className = "hide";
+    }
+
+    var searchParams = new URLSearchParams(window.location.search);
+    if (searchParams.get('scope') === 'activation') {
+        post('../server/api/activate.php',
+            {
+                email: searchParams.get('email'),
+                key: searchParams.get('key')
+            },
+            function(res) {
+                msgModalTitle.innerHTML = "Account activated successfully";
+                msgModalBody.innerHTML = "Your account was successfully activated! Now you can log into your account.";
+                msgModal.className = "msg-modal";
+            },
+            function(err) {
+                msgModalTitle.innerHTML = "Activation failed";
+                msgModalBody.innerHTML = "An error ocurred while activating your account! Error message: " + JSON.parse(err).errorMessage;
+                msgModal.className = "msg-modal";
+            }
+        );
+    }
+
+    get("../server/api/is-logged-in.php",
+        function(res) {
+            res = JSON.parse(res);
+            if (res.isLoggedIn === true) {
+                login();
+            }
+        },
+        function(err) {
+
+        }
+    );
     
     sendBtn.onclick = function() {
         chatSocket.send(inputBox.value);
@@ -120,46 +269,12 @@ window.onload = function(event) {
         }, 100);
     }
 
-    function prepend(el, htmlContent) {
-        var tmpEl = document.createElement('div');
-        tmpEl.innerHTML = htmlContent.trim();
-        var elToInsert = tmpEl.firstChild;
-        el.insertBefore(elToInsert, el.firstElementChild);
-    }
-    function append(el, htmlContent) {
-        var tmpEl = document.createElement('div');
-        tmpEl.innerHTML = htmlContent.trim();
-        var elToInsert = tmpEl.firstChild;
-        el.insertBefore(elToInsert);
-    }
-    function before(el, htmlContent) {
-        var tmpEl = document.createElement('div');
-        tmpEl.innerHTML = htmlContent.trim();
-        var elToInsert = tmpEl.firstChild;
-        el.parentElement.insertBefore(elToInsert, el);
-    }
-    function after(el, htmlContent) {
-        var tmpEl = document.createElement('div');
-        tmpEl.innerHTML = htmlContent.trim();
-        var elToInsert = tmpEl.firstChild;
-        el.parentElement.insertBefore(elToInsert, el.nextElementSibling);
-    }
-
     var emailValidRE = /([a-zA-Z0-9]|\.|_)+@[a-zA-Z]+\.[a-zA-Z]+/,
         lowerCaseRE = /.*[a-z]+.*/,
         upperCaseRE = /.*[A-Z]+.*/,
         digitsRE = /.*[0-9]+.*/,
         symbolsRE = /.*[^a-zA-Z0-9 \t\n]+.*/
     ;
-
-    function nrOfMatches(str) {
-        var n = 0;
-        if (lowerCaseRE.test(str)) ++n;
-        if (upperCaseRE.test(str)) ++n;
-        if (digitsRE.test(str)) ++n;
-        if (symbolsRE.test(str)) ++n;
-        return n;
-    }
 
     var emailErr = !emailValidRE.test(signupEmailInput.value),
         pwdErr = (signupPwdInput.value.length <= 5 || nrOfMatches(signupPwdInput.value) <= 1),
@@ -180,51 +295,6 @@ window.onload = function(event) {
             emailErr = false;
             checkSignupEmail.innerHTML = "";
             checkSignupEmail.className = "";
-        }
-    }
-
-    function checkPwd() {
-        var val = signupPwdInput.value;
-        if (val.length === 0) {
-            pwdErr = true;
-            checkSignupPwd.className = "hide";
-            return;
-        }
-        if (val.length <= 5 || nrOfMatches(val) <= 1) { // weak
-            pwdErr = true;
-            checkSignupPwd.firstElementChild.innerHTML = "Weak password";
-            checkSignupPwd.className = "pwd-secure weak";
-        } else if (val.length <= 8 || nrOfMatches(val) <= 2) { // medium
-            pwdErr = false;
-            checkSignupPwd.firstElementChild.innerHTML = "Medium password";
-            checkSignupPwd.className = "pwd-secure medium";
-        } else if (val.length < 10 || nrOfMatches(val) <= 3) { // good
-            pwdErr = false;
-            checkSignupPwd.firstElementChild.innerHTML = "Good password";
-            checkSignupPwd.className = "pwd-secure good";
-        } else { // strong
-            pwdErr = false;
-            checkSignupPwd.firstElementChild.innerHTML = "Strong password";
-            checkSignupPwd.className = "pwd-secure strong";
-        }
-    }
-    function checkMatchPwd() {
-        var pwd1 = signupPwdInput.value,
-            pwd2 = rePwdInput.value
-        ;
-        if (pwd2.length === 0) {
-            pwdMatchErr = true;
-            checkSignupRePwd.className = "hide";
-            return;
-        }
-        if (pwd1 !== pwd2) {
-            pwdMatchErr = true;
-            checkSignupRePwd.innerHTML = "Passwords don't match"
-            checkSignupRePwd.className = "danger"
-        } else {
-            pwdMatchErr = false;
-            checkSignupRePwd.innerHTML = "";
-            checkSignupRePwd.className = "";
         }
     }
 
@@ -250,17 +320,48 @@ window.onload = function(event) {
                 email: signupEmailInput.value,
                 password: signupPwdInput.value
             },
-            function(ev) {
-                console.log(ev);
+            function(result) {
+                srvResponse.className = "success-msg";
+                srvResponse.innerHTML = "Signup succesfull! An activation email was sent to you.";
+                setTimeout(function() {srvResponse.className = "hide";}, 3000);
             },
-            function(ev) {
-                console.log(ev);
+            function(error) {
+                srvResponse.className = "failure-msg";
+                srvResponse.innerHTML = "ERROR: "+JSON.parse(error).errorMessage;
+                setTimeout(function() {srvResponse.className = "hide";}, 3000);
             }
         );
     }
     
     loginFormBtn.onclick = function(ev) {
-        alert("qwerty");
+        if (!loginEmailInput.value || !loginPwdInput.value) {
+            loginSrvResponse.innerHTML = "Completați corect câmpurile!";
+            loginSrvResponse.className = "danger";
+            return;
+        }
+
+        loginSrvResponse.innerHTML = "";
+        loginSrvResponse.className = "hide";
+        post('../server/api/login.php',
+            {
+                email: loginEmailInput.value,
+                password: loginPwdInput.value,
+                rememberMe: rememberMe.checked
+            },
+            function(result) {
+                loginSrvResponse.className = "success-msg";
+                loginSrvResponse.innerHTML = "Login succesfull!";
+                setTimeout(function() {
+                    loginSrvResponse.className = "hide";
+                    login();
+                }, 3000);
+            },
+            function(error) {
+                loginSrvResponse.className = "failure-msg";
+                loginSrvResponse.innerHTML = "ERROR: "+JSON.parse(error).errorMessage;
+                setTimeout(function() {loginSrvResponse.className = "hide";}, 3000);
+            }
+        );
     }
 
 }
