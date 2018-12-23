@@ -31,6 +31,7 @@ window.onload = function(event) {
     var loginSrvResponse = document.getElementById('login-srv-response');
     var notLoggedIn = document.getElementById('not-logged-in');
     var loggedIn = document.getElementById('logged-in');
+    var profileMenuBtn = document.getElementById('profile-menu-btn');
 
     var chatSocket;
 
@@ -209,18 +210,33 @@ window.onload = function(event) {
         );
     }
 
-    get("../server/api/is-logged-in.php",
-        function(res) {
-            res = JSON.parse(res);
-            if (res.isLoggedIn === true) {
+    (function() {
+        var token = sessionStorage.getItem('token') || localStorage.getItem('token');
+        if (token) {
+            post('../server/api/checkToken.php',
+            {token: token},
+            function(res) {
                 login();
-            }
-        },
-        function(err) {
-
+            },
+            function(err) {
+            });
         }
-    );
+    })()
     
+    document.querySelector("#logout-btn").onclick = function() {
+        sessionStorage.removeItem('token');
+        localStorage.removeItem('token');
+        loggedIn.className = "logged-in hide";
+        notLoggedIn.className = "not-logged-in";
+    }
+
+    var profileDropdownOpened = false;
+    profileMenuBtn.onclick = function() {
+        var profileDropdown = document.getElementById("profile-dropdown");
+        profileDropdown.className = !profileDropdownOpened ? "profile-dropdown show" : "profile-dropdown";
+        profileDropdownOpened = !profileDropdownOpened;
+    }
+
     sendBtn.onclick = function() {
         chatSocket.send(inputBox.value);
         newMessage(inputBox.value, 0);
@@ -349,6 +365,11 @@ window.onload = function(event) {
                 rememberMe: rememberMe.checked
             },
             function(result) {
+                if (rememberMe.checked) {
+                    localStorage.setItem('token', JSON.parse(result).token);
+                } else {
+                    sessionStorage.setItem('token', JSON.parse(result).token);
+                }
                 loginSrvResponse.className = "success-msg";
                 loginSrvResponse.innerHTML = "Login succesfull!";
                 setTimeout(function() {

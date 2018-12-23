@@ -467,6 +467,46 @@ a:active {
     top: -5px;
 }
 
+.profile-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.profile-img {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    box-shadow: 2px 2px 4px #ccc;
+}
+
+.profile-name {
+    margin-left: 10px;
+}
+
+.profile-toolbar-item {
+    position: relative;
+}
+
+.profile-dropdown {
+    position: absolute;
+    top: 100%;
+    width: 100%;
+    height: 0;
+    overflow: hidden;
+    background-color: whitesmoke;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+    transition: height 0.3s ease;
+}
+
+.profile-dropdown.show {
+    height: 80px;
+}
+
 .hide {
     display: none;
 }
