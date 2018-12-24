@@ -56,6 +56,35 @@
                     </div>
                 </div>
             </div>
+            <div class="modal hide" id="forgot-pwd-modal">
+                <div class="backdrop" id="forgot-pwd-modal-backdrop">
+                </div>
+                <div class="forgot-pwd-form modal-dialog" id="forgot-pwd-form">
+                    <h3>Forgot Password?</h3>
+                    <div class="srv-response" id ="srv-response-forgot-pwd"></div>
+                    <p>We'll send you a verification email to reset your password.</p>
+                    <input type="email" id="forgot-pwd-email-input" name="forgot-pwd-email-input" placeholder="Email" />
+                    <button id="send-reset-pwd-email" class="submit-btn">Send</button>
+                </div>
+            </div>
+            <div class="modal hide" id="reset-pwd-modal">
+                <div class="backdrop" id="reset-pwd-modal-backdrop">
+                </div>
+                <div class="reset-pwd-form modal-dialog" id="reset-pwd-form">
+                    <h3>Reset Password:</h3>
+                    <div class="srv-response" id ="srv-response-reset-pwd"></div>
+                    <input type="password" id="reset-pwd-pwd-input" name="reset-pwd-pwd-input" placeholder="New Password" />
+                    <div id="check-reset-pwd" class="hide">
+                        <span></span>
+                        <div class="secure-level-container">
+                            <div class="secure-level"></div>
+                        </div>
+                    </div>
+                    <input type="password" id="reset-pwd-re-pwd-input" name="reset-pwd-re-pwd-input" placeholder="Re-Enter Password" />
+                    <div id="check-reset-re-pwd"></div>
+                    <button id="reset-pwd" class="submit-btn">Reset</button>
+                </div>
+            </div>
         </div>
         <div class="logged-in hide" id="logged-in">
             <header class="toolbar">

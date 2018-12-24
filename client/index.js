@@ -119,49 +119,84 @@ window.onload = function(event) {
         return n;
     }
 
-    function checkPwd() {
-        var val = signupPwdInput.value;
+    var emailValidRE = /([a-zA-Z0-9]|\.|_)+@[a-zA-Z]+\.[a-zA-Z]+/,
+        lowerCaseRE = /.*[a-z]+.*/,
+        upperCaseRE = /.*[A-Z]+.*/,
+        digitsRE = /.*[0-9]+.*/,
+        symbolsRE = /.*[^a-zA-Z0-9 \t\n]+.*/
+    ;
+
+    var emailErr = !emailValidRE.test(signupEmailInput.value),
+        pwdErr = (signupPwdInput.value.length <= 5 || nrOfMatches(signupPwdInput.value) <= 1),
+        pwdMatchErr = signupPwdInput.value !== rePwdInput.value
+    ;
+    
+    var pwdResetErr, pwdMatchResetErr;
+    (function() {
+        var input1 = document.querySelector("#reset-pwd-pwd-input");
+        var input2 = document.querySelector("#reset-pwd-re-pwd-input");
+        pwdResetErr = (input1.value.length <= 5 || nrOfMatches(input1.value) <= 1);
+        pwdMatchResetErr = input1.value !== input2.value;
+    })()
+
+    function checkEmail(input, output) {
+        var val = input.value;
         if (val.length === 0) {
-            pwdErr = true;
-            checkSignupPwd.className = "hide";
-            return;
+            output.className = "hide";
+            return true;
         }
-        if (val.length <= 5 || nrOfMatches(val) <= 1) { // weak
-            pwdErr = true;
-            checkSignupPwd.firstElementChild.innerHTML = "Weak password";
-            checkSignupPwd.className = "pwd-secure weak";
-        } else if (val.length <= 8 || nrOfMatches(val) <= 2) { // medium
-            pwdErr = false;
-            checkSignupPwd.firstElementChild.innerHTML = "Medium password";
-            checkSignupPwd.className = "pwd-secure medium";
-        } else if (val.length < 10 || nrOfMatches(val) <= 3) { // good
-            pwdErr = false;
-            checkSignupPwd.firstElementChild.innerHTML = "Good password";
-            checkSignupPwd.className = "pwd-secure good";
-        } else { // strong
-            pwdErr = false;
-            checkSignupPwd.firstElementChild.innerHTML = "Strong password";
-            checkSignupPwd.className = "pwd-secure strong";
+        if (!emailValidRE.test(val)) {
+            output.innerHTML = "Invalid email address";
+            output.className = "danger";
+            return true;
+        } else {
+            output.innerHTML = "";
+            output.className = "";
+            return false;
         }
     }
 
-    function checkMatchPwd() {
-        var pwd1 = signupPwdInput.value,
-            pwd2 = rePwdInput.value
+    function checkPwd(input, output) {
+        var val = input.value;
+        if (val.length === 0) {
+            output.className = "hide";
+            return true;
+        }
+        if (val.length <= 5 || nrOfMatches(val) <= 1) { // weak
+            output.firstElementChild.innerHTML = "Weak password";
+            output.className = "pwd-secure weak";
+            return true;
+        } else if (val.length <= 8 || nrOfMatches(val) <= 2) { // medium
+            output.firstElementChild.innerHTML = "Medium password";
+            output.className = "pwd-secure medium";
+            return false;
+        } else if (val.length < 10 || nrOfMatches(val) <= 3) { // good
+            output.firstElementChild.innerHTML = "Good password";
+            output.className = "pwd-secure good";
+            return false;
+        } else { // strong
+            output.firstElementChild.innerHTML = "Strong password";
+            output.className = "pwd-secure strong";
+            return false;
+        }
+    }
+
+    function checkMatchPwd(input1, input2, output) {
+        var pwd1 = input1.value,
+            pwd2 = input2.value
         ;
         if (pwd2.length === 0) {
-            pwdMatchErr = true;
-            checkSignupRePwd.className = "hide";
-            return;
+            output.className = "hide";
+            return true;
         }
         if (pwd1 !== pwd2) {
-            pwdMatchErr = true;
-            checkSignupRePwd.innerHTML = "Passwords don't match"
-            checkSignupRePwd.className = "danger"
+            output.innerHTML = "Passwords don't match"
+            output.className = "danger"
+            return true;
         } else {
-            pwdMatchErr = false;
-            checkSignupRePwd.innerHTML = "";
-            checkSignupRePwd.className = "";
+            output.innerHTML = "";
+            output.className = "";
+            return false;
         }
     }
 
@@ -183,6 +218,56 @@ window.onload = function(event) {
         chatSocket.onerror = function(event) {
             console.log("ERROR", event);
         }
+    }
+
+    function showAuthModal() {
+        authModal.className = "auth-modal";
+        setTimeout(function() {
+            authBox.className = "auth-box slide-down";
+        }, 100);
+    }
+
+    function hideAuthModal() {
+        authBox.className = "auth-box";
+        setTimeout(function() {
+            authModal.className = "hide";
+        }, 300);
+    }
+    
+    function showForgotPwdModal() {
+        var modal = document.querySelector("#forgot-pwd-modal");
+        var dialog = document.querySelector("#forgot-pwd-form");
+        modal.className = "modal";
+        setTimeout(function() {
+            dialog.className = "forgot-pwd-form modal-dialog slide-down";
+        }, 100);
+    }
+
+    function hideForgotPwdModal() {
+        var modal = document.querySelector("#forgot-pwd-modal");
+        var dialog = document.querySelector("#forgot-pwd-form");
+        dialog.className = "forgot-pwd-form modal-dialog";
+        setTimeout(function() {
+            modal.className = "hide";
+        }, 300);
+    }
+    
+    function showResetPwdModal() {
+        var modal = document.querySelector("#reset-pwd-modal");
+        var dialog = document.querySelector("#reset-pwd-form");
+        modal.className = "modal";
+        setTimeout(function() {
+            dialog.className = "reset-pwd-form modal-dialog slide-down";
+        }, 100);
+    }
+
+    function hideResetPwdModal() {
+        var modal = document.querySelector("#reset-pwd-modal");
+        var dialog = document.querySelector("#reset-pwd-form");
+        dialog.className = "reset-pwd-form modal-dialog";
+        setTimeout(function() {
+            modal.className = "hide";
+        }, 300);
     }
 
 
@@ -208,6 +293,8 @@ window.onload = function(event) {
                 msgModal.className = "msg-modal";
             }
         );
+    } else if (searchParams.get('scope') === 'reset-pwd') {
+        showResetPwdModal();
     }
 
     (function() {
@@ -228,6 +315,79 @@ window.onload = function(event) {
         localStorage.removeItem('token');
         loggedIn.className = "logged-in hide";
         notLoggedIn.className = "not-logged-in";
+    }
+
+    document.querySelector("#forgot-pwd").onclick = function() {
+        hideAuthModal();
+        showForgotPwdModal();
+    }
+
+    document.querySelector("#forgot-pwd-modal-backdrop").onclick = hideForgotPwdModal;
+
+    document.querySelector("#reset-pwd-modal-backdrop").onclick = hideResetPwdModal;
+
+    document.querySelector("#send-reset-pwd-email").onclick = function() {
+        var email = document.querySelector("#forgot-pwd-email-input").value;
+        post('../server/api/sendForgotPwdEmail.php',
+            {
+                email: document.querySelector("#forgot-pwd-email-input").value
+            },
+            function(res) {
+                var resDiv = document.querySelector("#srv-response-forgot-pwd");
+                resDiv.className = "success-msg";
+                resDiv.innerHTML = "Email sent successfully!";
+            },
+            function(err) {
+                var resDiv = document.querySelector("#srv-response-forgot-pwd");
+                resDiv.className = "failure-msg";
+                // resDiv.innerHTML = err;
+                resDiv.innerHTML = "Error sending email!";
+            }
+        );
+    }
+
+    document.querySelector("#reset-pwd").onclick = function() {
+        var resDiv = document.querySelector("#srv-response-reset-pwd");
+        if (pwdResetErr || pwdMatchResetErr) {
+            resDiv.innerHTML = "Completați corect câmpurile!";
+            resDiv.className = "danger";
+            return;
+        }
+        resDiv.innerHTML = "";
+        resDiv.className = "hide";
+        post('../server/api/resetPwd.php',
+            {
+                token: searchParams.get("token"),
+                password: document.querySelector("#reset-pwd-pwd-input").value
+            },
+            function(res) {
+                resDiv.className = "success-msg";
+                resDiv.innerHTML = "The password has been successfully reset!";
+            },
+            function(err) {
+                resDiv.className = "failure-msg";
+                // resDiv.innerHTML = err;
+                resDiv.innerHTML = "Could not reset password!!";
+            }
+        );
+    }
+    
+    document.querySelector("#reset-pwd-pwd-input").onkeyup = function() {
+        var input1 = document.querySelector("#reset-pwd-pwd-input");
+        var input2 = document.querySelector("#reset-pwd-re-pwd-input");
+        var output1 = document.querySelector("#check-reset-pwd");
+        var output2 = document.querySelector("#check-reset-re-pwd");
+        pwdResetErr = checkPwd(input1, output1);
+        pwdMatchResetErr = checkMatchPwd(input1, input2, output2);
+    }
+    
+    document.querySelector("#reset-pwd-re-pwd-input").onkeyup = function() {
+        var input1 = document.querySelector("#reset-pwd-pwd-input");
+        var input2 = document.querySelector("#reset-pwd-re-pwd-input");
+        var output1 = document.querySelector("#check-reset-pwd");
+        var output2 = document.querySelector("#check-reset-re-pwd");
+        pwdResetErr = checkPwd(input1, output1);
+        pwdMatchResetErr = checkMatchPwd(input1, input2, output2);
     }
 
     var profileDropdownOpened = false;
@@ -257,70 +417,34 @@ window.onload = function(event) {
         loginTabLink.className = "active-tab";
     }
 
-    backdrop.onclick = function() {
-        authBox.className = "auth-box";
-        setTimeout(function() {
-            authModal.className = "hide";
-        }, 300);
-    }
+    backdrop.onclick = hideAuthModal;
 
     signupBtn.onclick = function() {
         loginForm.className = "login-form";
         loginTabLink.className = "";
         signupForm.className = "signup-form active-form";
         signupTabLink.className = "active-tab";
-        authModal.className = "auth-modal";
-        setTimeout(function() {
-            authBox.className = "auth-box slide-down";
-        }, 100);
+        showAuthModal();
     }
     loginBtn.onclick = function() {
         signupForm.className = "signup-form";
         signupTabLink.className = "";
         loginForm.className = "login-form active-form";
         loginTabLink.className = "active-tab";
-        authModal.className = "auth-modal";
-        setTimeout(function() {
-            authBox.className = "auth-box slide-down";
-        }, 100);
+        showAuthModal();
     }
-
-    var emailValidRE = /([a-zA-Z0-9]|\.|_)+@[a-zA-Z]+\.[a-zA-Z]+/,
-        lowerCaseRE = /.*[a-z]+.*/,
-        upperCaseRE = /.*[A-Z]+.*/,
-        digitsRE = /.*[0-9]+.*/,
-        symbolsRE = /.*[^a-zA-Z0-9 \t\n]+.*/
-    ;
-
-    var emailErr = !emailValidRE.test(signupEmailInput.value),
-        pwdErr = (signupPwdInput.value.length <= 5 || nrOfMatches(signupPwdInput.value) <= 1),
-        pwdMatchErr = signupPwdInput.value !== rePwdInput.value;
     
     signupEmailInput.onkeyup = function(ev) {
-        var val = signupEmailInput.value;
-        if (val.length === 0) {
-            emailErr = true;
-            checkSignupEmail.className = "hide";
-            return;
-        }
-        if (!emailValidRE.test(val)) {
-            emailErr = true;
-            checkSignupEmail.innerHTML = "Invalid email address"
-            checkSignupEmail.className = "danger"
-        } else {
-            emailErr = false;
-            checkSignupEmail.innerHTML = "";
-            checkSignupEmail.className = "";
-        }
+        emailErr = checkEmail(signupEmailInput, checkSignupEmail);
     }
 
     signupPwdInput.onkeyup = function(ev) {
-        checkPwd();
-        checkMatchPwd();
+        pwdErr = checkPwd(signupPwdInput, checkSignupPwd);
+        pwdMatchErr = checkMatchPwd(signupPwdInput, rePwdInput, checkSignupRePwd);
     }
     rePwdInput.onkeyup = function(ev) {
-        checkPwd();
-        checkMatchPwd();
+        pwdErr = checkPwd(signupPwdInput, checkSignupPwd);
+        pwdMatchErr = checkMatchPwd(signupPwdInput, rePwdInput, checkSignupRePwd);
     }
 
     signupFormBtn.onclick = function(ev) {

@@ -16,7 +16,15 @@ $db = new PDO('mysql:host=localhost', username, password);
 // $res = $db->exec("CREATE TABLE ChatApp.Tokens ("
 //     ."IdToken VARCHAR(256) PRIMARY KEY,"
 //     ."UserId BIGINT NOT NULL,"
-//     ."VerifyToken VARCHAR(256) NOT NULL"
+//     ."VerifyToken VARCHAR(256) NOT NULL,"
+//     ."Expires BIGINT NOT NULL"
+//     .");"
+// );
+
+// $res = $db->exec("CREATE TABLE ChatApp.ForgotPwd ("
+//     ."ResetId VARCHAR(256) PRIMARY KEY,"
+//     ."UserId BIGINT NOT NULL,"
+//     ."VerifyResetId VARCHAR(256) NOT NULL,"
 //     ."Expires BIGINT NOT NULL"
 //     .");"
 // );

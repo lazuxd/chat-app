@@ -56,7 +56,8 @@ a:active {
 }
 
 .auth-modal,
-.msg-modal {
+.msg-modal,
+.modal {
     position: fixed;
     left: 0;
     top: 0;
@@ -78,7 +79,8 @@ a:active {
     /* z-index: 10; */
 }
 
-.auth-box {
+.auth-box,
+.modal-dialog {
     background-color: white;
     padding: 20px;
     border-radius: 20px;
@@ -86,6 +88,14 @@ a:active {
     z-index: 10;
     transform: translateY(-100vh);
     transition: transform 0.3s ease-in;
+}
+
+.modal-dialog {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+    min-width: 440px;
 }
 
 @media (max-width: 499.98px) {
@@ -171,7 +181,9 @@ a:active {
 }
 
 .signup-form input,
-.login-form input {
+.login-form input,
+.forgot-pwd-form input,
+.reset-pwd-form input {
     margin: 10px;
     padding: 10px;
     font-size: 1.2em;
@@ -197,7 +209,8 @@ a:active {
     box-shadow: 8px 8px 10px #ccc;
 }
 
-.auth-box.slide-down {
+.auth-box.slide-down,
+.modal-dialog.slide-down {
     transform: translateY(0);
 }
 
