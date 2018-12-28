@@ -1,5 +1,7 @@
 <?php
 
+    ini_set("display_errors", "On");
+
     require_once("../src/data.php");
     require_once("../src/functions.php");
     require_once("../src/sendMail.php");
@@ -22,6 +24,10 @@
             ':dName' => $displayName,
             ':active' => $active
         ));
+
+        $userId = $db->lastInsertId();
+        mkdir("../images/$userId");
+        copy("../images/profile.png", "../images/$userId/profile.png");
 
         $url = $_SERVER['HTTP_REFERER'] . 'index.html?scope=activation&email=' . urlencode(htmlspecialchars_decode($email)) . '&key=' . $active;
         sendMail('contact@ldxdev.com', 'LdxDev', array(htmlspecialchars_decode($email)), 'Activate your account', 'Please click on the following link to activate your account: ' . $url);

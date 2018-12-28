@@ -200,7 +200,11 @@ window.onload = function(event) {
         }
     }
 
-    function login() {
+    function login(res) {
+        profileImgs = ["#profile-img", "#edit-profile-img"];
+        profileImgs.forEach(function(item) {
+            document.querySelector(item).setAttribute("src", "../server/images/"+res.userId+"/profile.png");
+        });
         msgModal.className = "hide";
         notLoggedIn.className = "hide";
         loggedIn.className = "logged-in";
@@ -303,13 +307,18 @@ window.onload = function(event) {
             post('../server/api/checkToken.php',
             {token: token},
             function(res) {
-                login();
+                login(JSON.parse(res));
             },
             function(err) {
             });
         }
     })()
     
+    document.querySelector("#edit-profile-btn").onclick = function() {
+        document.querySelector("#chat-box").className = "hide";
+        document.querySelector("#edit-profile").className = "edit-profile";
+    }
+
     document.querySelector("#logout-btn").onclick = function() {
         sessionStorage.removeItem('token');
         localStorage.removeItem('token');

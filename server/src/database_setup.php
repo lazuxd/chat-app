@@ -13,24 +13,32 @@ $db = new PDO('mysql:host=localhost', username, password);
 //     .");"
 // );
 
+// if ($res === false) {
+//     var_dump($db->errorInfo());
+// }
+
 // $res = $db->exec("CREATE TABLE ChatApp.Tokens ("
-//     ."IdToken VARCHAR(256) PRIMARY KEY,"
+//     ."IdToken VARCHAR(128) PRIMARY KEY,"
 //     ."UserId BIGINT NOT NULL,"
 //     ."VerifyToken VARCHAR(256) NOT NULL,"
 //     ."Expires BIGINT NOT NULL"
 //     .");"
 // );
 
+// if ($res === false) {
+//     var_dump($db->errorInfo());
+// }
+
 // $res = $db->exec("CREATE TABLE ChatApp.ForgotPwd ("
-//     ."ResetId VARCHAR(256) PRIMARY KEY,"
+//     ."ResetId VARCHAR(128) PRIMARY KEY,"
 //     ."UserId BIGINT NOT NULL,"
 //     ."VerifyResetId VARCHAR(256) NOT NULL,"
 //     ."Expires BIGINT NOT NULL"
 //     .");"
 // );
 
-if ($res === false) {
-    var_dump($db->errorInfo());
-}
+// if ($res === false) {
+//     var_dump($db->errorInfo());
+// }
 
 ?>
