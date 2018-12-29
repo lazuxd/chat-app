@@ -41,4 +41,38 @@ $db = new PDO('mysql:host=localhost', username, password);
 //     var_dump($db->errorInfo());
 // }
 
+// $res = $db->exec("CREATE TABLE ChatApp.Conversations ("
+//     ."ConvID BIGINT PRIMARY KEY AUTO_INCREMENT,"
+//     ."Name VARCHAR(128),"
+//     ."AdminID BIGINT,"
+//     ."ImageURL VARCHAR(256)"
+//     .");"
+// );
+
+// if ($res === false) {
+//     var_dump($db->errorInfo());
+// }
+
+// $res = $db->exec("CREATE TABLE ChatApp.ConvUsers ("
+//     ."ConvID BIGINT NOT NULL,"
+//     ."UserID BIGINT NOT NULL"
+//     .");"
+// );
+
+// if ($res === false) {
+//     var_dump($db->errorInfo());
+// }
+
+// $res = $db->exec("CREATE TABLE ChatApp.Messages ("
+//     ."MsgID BIGINT PRIMARY KEY AUTO_INCREMENT,"
+//     ."Message TEXT NOT NULL,"
+//     ."ConvID BIGINT NOT NULL,"
+//     ."UserID BIGINT NOT NULL"
+//     .");"
+// );
+
+// if ($res === false) {
+//     var_dump($db->errorInfo());
+// }
+
 ?>
