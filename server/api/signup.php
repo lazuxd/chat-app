@@ -25,6 +25,7 @@
             ':active' => $active
         ));
 
+        $stmt->closeCursor();
         $userId = $db->lastInsertId();
         mkdir("../images/$userId");
         copy("../images/profile.png", "../images/$userId/profile.png");

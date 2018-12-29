@@ -50,6 +50,26 @@ window.onload = function(event) {
         scrollBox.scrollTop = scrollBox.scrollHeight;
     }
 
+    function postUpload(url, files, successCB, errorCB) {
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", url, true);
+        xhr.onreadystatechange = function(ev) {
+            if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
+                successCB && successCB(this.response);
+            }
+            if (this.readyState === XMLHttpRequest.DONE && this.status !== 200) {
+                errorCB && errorCB(this.response);
+            }
+        }
+
+        var formData = new FormData();
+        Object.keys(files).forEach(function(key) {
+            formData.append(key, files[key]);
+        });
+
+        xhr.send(formData);
+    }
+    
     function post(url, data, successCB, errorCB) {
         var xhr = new XMLHttpRequest();
         xhr.open("POST", url, true);
@@ -200,11 +220,51 @@ window.onload = function(event) {
         }
     }
 
+    function showProfileImgPreview() {
+        var input = document.querySelector("#img-file-input");
+        if (input.files && input.files[0]) {
+            var img = document.querySelector("#edit-profile-img");
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                img.setAttribute("src", e.target.result);
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
     function login(res) {
-        profileImgs = ["#profile-img", "#edit-profile-img"];
-        profileImgs.forEach(function(item) {
-            document.querySelector(item).setAttribute("src", "../server/images/"+res.userId+"/profile.png");
-        });
+        var token = sessionStorage.getItem('token') || localStorage.getItem('token');
+        var profileImgs = document.getElementsByClassName("update-profile-img");
+        post("../server/api/profileImg.php", 
+            {
+                token: token
+            },
+            function(res) {
+                var imgURL = JSON.parse(res).imgURL;
+                for (var item of profileImgs) {
+                    item.setAttribute("src", imgURL);
+                }
+            },
+            function(err) {
+                profileImgs.forEach(function(item) {
+                    item.setAttribute("src", "../server/images/profile.png");
+                });
+            }
+        );
+        post("../server/api/userName.php",
+                {
+                    token: token
+                },
+                function(res) {
+                    var nameText = htmlentities(JSON.parse(res).displayName);
+                    var names = document.getElementsByClassName("update-display-name");
+                    for (var name of names) {
+                        name.innerHTML = nameText;
+                    }
+                },
+                function(err) {
+                }
+            );
         msgModal.className = "hide";
         notLoggedIn.className = "hide";
         loggedIn.className = "logged-in";
@@ -274,6 +334,12 @@ window.onload = function(event) {
         }, 300);
     }
 
+    function htmlentities(str) {
+        return str.replace(/[\u00A0-\u9999<>\&]/gim, function(i) {
+            return '&#'+i.charCodeAt(0)+';';
+        });
+    }
+
 
     msgModalBackdrop.onclick = function() {
         msgModal.className = "hide";
@@ -314,9 +380,63 @@ window.onload = function(event) {
         }
     })()
     
+    document.querySelector("#img-file-input").onchange = showProfileImgPreview;
+
+    document.querySelector("#edit-profile-save").onclick = function() {
+        var imgInput = document.querySelector("#img-file-input");
+        var nameInput = document.querySelector("#edit-name-input");
+        var token = sessionStorage.getItem('token') || localStorage.getItem('token');
+        if (imgInput.files && imgInput.files[0]) {
+            postUpload("../server/api/profileImg.php",
+                {
+                    token: token,
+                    profileImg: imgInput.files[0]
+                },
+                function(res) {
+                    var profileImgs = document.getElementsByClassName("update-profile-img");
+                    var imgURL = JSON.parse(res).imgURL+"?time="+Date.now();
+                    for (var item of profileImgs) {
+                        item.setAttribute("src", imgURL);
+                    }
+                },
+                function(err) {
+                }
+            );
+        }
+        if (nameInput.value !== "") {
+            post("../server/api/userName.php",
+                {
+                    token: token,
+                    DisplayName: nameInput.value
+                },
+                function(res) {
+                    var nameText = htmlentities(JSON.parse(res).displayName);
+                    var names = document.getElementsByClassName("update-display-name");
+                    for (var name of names) {
+                        name.innerHTML = nameText;
+                    }
+                },
+                function(err) {
+                }
+            );
+        }
+    }
+
     document.querySelector("#edit-profile-btn").onclick = function() {
         document.querySelector("#chat-box").className = "hide";
         document.querySelector("#edit-profile").className = "edit-profile";
+        var token = sessionStorage.getItem('token') || localStorage.getItem('token');
+        post("../server/api/userName.php",
+            {
+                token: token
+            },
+            function(res) {
+                document.querySelector("#edit-name-input").value = JSON.parse(res).displayName;
+            },
+            function(err) {
+                document.querySelector("#edit-name-input").value = "";
+            }
+        );
     }
 
     document.querySelector("#logout-btn").onclick = function() {

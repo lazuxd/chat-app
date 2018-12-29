@@ -29,6 +29,7 @@ try {
         $UserId = $row["UserId"];
         $hashedPwd = password_hash($password, PASSWORD_DEFAULT);
         $db->exec("UPDATE Users SET HashedPwd = '$hashedPwd' WHERE UserID = $UserId;");
+        $stmt->closeCursor();
         try {
             $db->exec("DELETE FROM ForgotPwd WHERE UserId = $UserId;");
         } catch (Exception $e) {

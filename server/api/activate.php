@@ -11,23 +11,19 @@ try {
     $stmt = $db->prepare("SELECT Active FROM Users WHERE Email = :email;");
     if (!$stmt->execute(array(':email' => $email))) {
         throw new Exception("Error while executing query");
+    } else if (!($res = $stmt->fetch())) {
+        throw new Exception("Error while fetching data");
+    } else if ($res['Active'] !== $key) {
+        throw new Exception("The keys don't match!");
     } else {
-        if (!($res = $stmt->fetch())) {
-            throw new Exception("Error while fetching data");
+        $stmt = $db->prepare("UPDATE Users SET Active = 'active' WHERE Email = :email;");
+        if (!$stmt->execute(array(':email' => $email))) {
+            throw new Exception("Error while updating database");
         } else {
-            if ($res['Active'] !== $key) {
-                throw new Exception("The keys don't match!");
-            } else {
-                $stmt= $db->prepare("UPDATE Users SET Active = 'active' WHERE Email = :email;");
-                if (!$stmt->execute(array(':email' => $email))) {
-                    throw new Exception("Error while updating database");
-                } else {
-                    sendJSON(["success" => true], 200);
-                }
-            }
+            sendJSON(["success" => true], 200);
         }
     }
-
+    $stmt->closeCursor();
 } catch (Exception $e) {
     sendJSON(array("errorMessage" => $e->getMessage()), 500);
 }

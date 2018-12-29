@@ -26,6 +26,7 @@ try {
         $hashVerifyToken = hash("sha512", $VerifyToken);
         $ExpiresTimestamp = time() + 15 * 24 * 60 * 60;
         $db->exec("INSERT INTO Tokens VALUES ('$IdToken', $UserID, '$hashVerifyToken', $ExpiresTimestamp);");
+        $stmt->closeCursor();
 
         $token = $IdToken . "$" . $VerifyToken;
         sendJSON([

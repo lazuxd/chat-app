@@ -25,6 +25,7 @@ function checkToken(string $tk, bool $shouldThrow = false) {
         } else {
             return $row["UserId"];
         }
+        $stmt->closeCursor();
     } catch (Exception $e) {
         if ($shouldThrow) {
             throw $e;

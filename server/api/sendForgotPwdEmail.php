@@ -23,6 +23,7 @@ try {
         $Expires = time() + 24 * 60 * 60;
         $db->exec("INSERT INTO ForgotPwd VALUES ('$ResetId', $UserId, '$hashedVerifyResetId', $Expires);");
         $token = $ResetId . '$' . $VerifyResetId;
+        $stmt->closeCursor();
 
         $url = explode("?", $_SERVER['HTTP_REFERER'])[0] . '?scope=reset-pwd&token=' . $token;
         sendMail("contact@ldxdev.com", "LdxDev", [$email], "Reset your password", "Please click on the following link to reset your password:<br/>$url");
