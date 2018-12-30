@@ -9,7 +9,8 @@ $db = new PDO('mysql:host=localhost', username, password);
 //     ."Email VARCHAR(50) NOT NULL UNIQUE,"
 //     ."HashedPwd VARCHAR(256) NOT NULL,"
 //     ."DisplayName VARCHAR(50) NOT NULL,"
-//     ."Active VARCHAR(256) NOT NULL"
+//     ."Active VARCHAR(256) NOT NULL,"
+//     ."ImageURL VARCHAR(256) NOT NULL"
 //     .");"
 // );
 
