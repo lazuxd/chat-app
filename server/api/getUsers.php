@@ -9,8 +9,8 @@ try {
     $search = $_POST["search"];
     $db = new PDO("mysql:dbname=ChatApp;host=localhost", username, password);
     $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    $stmt = $db->prepare("SELECT UserID, DisplayName AS Name, ImageURL FROM Users WHERE DisplayName LIKE :search;");
-    if (!$stmt->execute([":search" => '%'.$search.'%'])) {
+    $stmt = $db->prepare("SELECT UserID, DisplayName AS Name, ImageURL FROM Users WHERE UserID <> :userId AND DisplayName LIKE :search;");
+    if (!$stmt->execute([":userId" => $userId, ":search" => '%'.$search.'%'])) {
         throw new Exception("Could not execute query.");
     } else if (!($Users = $stmt->fetchAll(PDO::FETCH_ASSOC))) {
         throw new Exception("Could not fetch data.");
