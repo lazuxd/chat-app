@@ -25,8 +25,8 @@ if ($_POST["token"] && !$_POST["DisplayName"]) {
 
         $db = new PDO("mysql:dbname=ChatApp;host=localhost", username, password);
         $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        $stmt = $db->prepare("UPDATE Users SET DisplayName = :newName;");
-        if (!$stmt->execute([":newName" => $newName])) {
+        $stmt = $db->prepare("UPDATE Users SET DisplayName = :newName WHERE UserID = :userId;");
+        if (!$stmt->execute([":newName" => $newName, ":userId" => $userId])) {
             throw new Exception("Error updating name.");
         }
         sendJSON(["success" => true, "displayName" => $newName], 200);

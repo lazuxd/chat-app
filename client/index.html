@@ -89,7 +89,7 @@
         <div class="logged-in hide" id="logged-in">
             <header class="toolbar">
                 <ul>
-                    <li><a class="active-toolbar-tab" href="#">Convorbiri</a></li>
+                    <li><a id="conv-toolbar-item" class="active-toolbar-tab">Convorbiri</a></li>
                     <li><a href="#">Setări</a></li>
                     <li class="space"></li>
                     <li class="profile-toolbar-item">
@@ -104,6 +104,46 @@
                     </li>
                 </ul>
             </header>
+            <div class="modal" id="new-conv-modal">
+                <div class="backdrop" id="conv-modal-backdrop">
+                </div>
+                <div class="modal-dialog slide-down" id="new-conv-dialog">
+                    <div class="auth-tabs">
+                        <ul>
+                            <li><a id="signup-tab-link" href="#signup-form">Sign Up</a></li>
+                            <li><a id="login-tab-link" class="active-tab" href="#login-form">Login</a></li>
+                        </ul>
+                    </div>
+                    <div class="signup-form" id="signup-form">
+                        <div class="srv-response" id ="srv-response"></div>
+                        <input type="email" id="signup-email-input" name="email-input" placeholder="Email" />
+                        <div id="check-signup-email"></div>
+                        <input type="password" id="signup-pwd-input" name="pwd-input" placeholder="Password" />
+                        <div id="check-signup-pwd" class="hide">
+                            <span></span>
+                            <div class="secure-level-container">
+                                <div class="secure-level"></div>
+                            </div>
+                        </div>
+                        <input type="password" id="re-pwd-input" name="re-pwd-input" placeholder="Re-Enter Password" />
+                        <div id="check-signup-re-pwd"></div>
+                        <button id="signup-form-btn" class="submit-btn">Sign Up</button>
+                    </div>
+                    <div class="login-form active-form" id="login-form">
+                        <div class="srv-response" id="login-srv-response"></div>
+                        <input type="email" id="login-email-input" name="email-input" placeholder="Email"/>
+                        <input type="password" id="login-pwd-input" name="pwd-input" placeholder="Password"/>
+                        <div class="login-options">
+                            <div class="remember-me-container">
+                                <input type="checkbox" id="remember-me" name="remember-me"/>
+                                <label for="remember-me">Remember me</label>
+                            </div>
+                            <button id="forgot-pwd" class="forgot-pwd">Forgot password?</button>
+                        </div>
+                        <button id="login-form-btn" class="submit-btn">Login</button>
+                    </div>
+                </div>
+            </div>
             <div class="edit-profile hide" id="edit-profile">
                 <h3>Profile Image</h3>
                 <div class="edit-img-div">
@@ -114,9 +154,15 @@
                 <div class="edit-name-div">
                     <input id="edit-name-input" type="text"/>
                 </div>
-                <button id="edit-profile-save" class="btn">Save</button>
+                <button id="edit-profile-save" class="btn btn2">Save</button>
             </div>
-            <div class="chat-box" id="chat-box">
+            <div class="conv-list-container hide" id="conv-list">
+                <ul class="conv-list" id="conv-ul">
+
+                </ul>
+                <button class="float-btn" id="new-conv">&plus;</button>
+            </div>
+            <div class="chat-box hide" id="chat-box">
                 <div class="messages-box card">
                     <div class="inside-msg-box">
                         <div class="inner-box"></div>

@@ -15,14 +15,15 @@
         $db = new PDO('mysql:dbname=ChatApp;host=localhost', username, password);
         $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         $stmt = $db->prepare('INSERT INTO
-            Users ( Email, HashedPwd, DisplayName, Active )
-            VALUES ( :email, :pwd, :dName, :active );')
+            Users ( Email, HashedPwd, DisplayName, Active, ImageURL )
+            VALUES ( :email, :pwd, :dName, :active, :imgURL );')
         ;
         $stmt->execute(array(
             ':email' => $email,
             ':pwd' => $password,
             ':dName' => $displayName,
-            ':active' => $active
+            ':active' => $active,
+            ':imgURL' => "../server/images/$userId/profile.png"
         ));
 
         $stmt->closeCursor();

@@ -115,7 +115,7 @@ window.onload = function(event) {
         var tmpEl = document.createElement('div');
         tmpEl.innerHTML = htmlContent.trim();
         var elToInsert = tmpEl.firstChild;
-        el.insertBefore(elToInsert);
+        el.insertBefore(elToInsert, null);
     }
     function before(el, htmlContent) {
         var tmpEl = document.createElement('div');
@@ -232,6 +232,47 @@ window.onload = function(event) {
         }
     }
 
+    function showConversations() {
+        document.querySelector("#conv-list").className = "conv-list-container";
+        document.querySelector("#conv-toolbar-item").className = "active-toolbar-tab";
+        post(
+            "../server/api/getConversations.php",
+            {
+                token: sessionStorage.getItem("token") || localStorage.getItem("token")
+            },
+            function(res) {
+                var convList = JSON.parse(res);
+                var list = document.querySelector("#conv-ul");
+                list.innerHTML = "";
+                if (convList.GroupsConv.length === 0 && convList.PrivateConv.length === 0) {
+                    append(list, "<p>Nu există convorbiri.</p>");
+                } else {
+                    for (var conv of convList.GroupsConv) {
+                        var li =
+                            "<li class='conv-li'>" +
+                                "<img src='"+conv.ImageURL+"'/>" +
+                                "<h3>"+conv.Name+"</h3>" +
+                            "</li>"
+                        ;
+                        append(list, li);
+                    }
+                    for (var conv of convList.PrivateConv) {
+                        var li =
+                            "<li class='conv-li'>" +
+                                "<img src='"+conv.ImageURL+"'/>" +
+                                "<h3>"+conv.Name+"</h3>" +
+                            "</li>"
+                        ;
+                        append(list, li);
+                    }
+                }
+            },
+            function(err) {
+                console.log(JSON.parses(err));
+            }
+        );
+    }
+
     function login(res) {
         var token = sessionStorage.getItem('token') || localStorage.getItem('token');
         var profileImgs = document.getElementsByClassName("update-profile-img");
@@ -268,20 +309,21 @@ window.onload = function(event) {
         msgModal.className = "hide";
         notLoggedIn.className = "hide";
         loggedIn.className = "logged-in";
-        chatSocket = new WebSocket('ws://localhost:8080/chat');
-        chatSocket.onopen = function(event) {
-            console.log("OPEN", event);
-        }
-        chatSocket.onmessage = function(event) {
-            newMessage(event.data, 1);
-            console.log("MESSAGE", event);
-        }
-        chatSocket.onclose = function(event) {
-            console.log("CLOSE", event);
-        }
-        chatSocket.onerror = function(event) {
-            console.log("ERROR", event);
-        }
+        showConversations();
+        // chatSocket = new WebSocket('ws://localhost:8080/chat');
+        // chatSocket.onopen = function(event) {
+        //     console.log("OPEN", event);
+        // }
+        // chatSocket.onmessage = function(event) {
+        //     newMessage(event.data, 1);
+        //     console.log("MESSAGE", event);
+        // }
+        // chatSocket.onclose = function(event) {
+        //     console.log("CLOSE", event);
+        // }
+        // chatSocket.onerror = function(event) {
+        //     console.log("ERROR", event);
+        // }
     }
 
     function showAuthModal() {
@@ -380,6 +422,8 @@ window.onload = function(event) {
         }
     })()
     
+    document.querySelector("#conv-toolbar-item").onclick = showConversations;
+
     document.querySelector("#img-file-input").onchange = showProfileImgPreview;
 
     document.querySelector("#edit-profile-save").onclick = function() {

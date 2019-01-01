@@ -7,15 +7,15 @@ require_once("../src/checkToken.php");
 if ($_POST["token"] && !$_FILES["profileImg"]) {
     try {
         $userId = checkToken($_POST["token"], true);
-        $filesInDir = scandir("../images/$userId/");
-        $imgURL = "";
-        foreach ($filesInDir as $key => $val ) {
-            if (strpos($val, "profile") === 0) {
-                $imgURL = "../server/images/$userId/$val";
-                break;
-            }
+        $db = new PDO("mysql:dbname=ChatApp;host=localhost", username, password);
+        $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $stmt = $db->prepare("SELECT ImageURL FROM Users WHERE UserID = :userId;");
+        if (!$stmt->execute([":userId" => $userId])) {
+            throw new Exception("Could not execute query.");
+        } else if (false === ($row = $stmt->fetch())) {
+            throw new Exception("Could not fetch data.");
         }
-        sendJSON(["imgURL" => $imgURL], 200);
+        sendJSON(["imgURL" => $row["ImageURL"]], 200);
     } catch (Exception $e) {
         sendJSON(["errorMessage" => $e->getMessage()], 500);
     }
@@ -35,6 +35,12 @@ if ($_POST["token"] && !$_FILES["profileImg"]) {
             if (strpos($val, "profile.$extension") !== 0 && $val !== "." && $val !== "..") {
                 unlink("../images/$userId/$val");
             }
+        }
+        $db = new PDO("mysql:dbname=ChatApp;host=localhost", username, password);
+        $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $stmt = $db->prepare("UPDATE Users SET ImageURL = :imgURL WHERE UserID = :userId;");
+        if (!$stmt->execute([":imgURL" => $imgURL, ":userId" => $userId])) {
+            throw new Exception("Could not execute query.");
         }
         sendJSON(["imgURL" => $imgURL], 200);
     } catch (Exception $e) {
