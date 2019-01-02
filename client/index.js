@@ -376,6 +376,68 @@ window.onload = function(event) {
         }, 300);
     }
 
+    function getUserList(search, list) {
+        list.innerHTML = "";
+        post(
+            "../server/api/getUsers.php",
+            {
+                token: sessionStorage.getItem("token") || localStorage.getItem("token"),
+                search: search.value
+            },
+            function(res) {
+                users = JSON.parse(res).Users;
+                for (var user of users) {
+                    var li =
+                        "<li>" +
+                            "<img src='"+user.ImageURL+"'/>" +
+                            "<p>"+user.Name+"</p>" +
+                        "</li>"
+                    ;
+                    append(list, li);
+                }
+            },
+            function(err) {
+                // err = JSON.parse(err);
+                // console.log(err);
+            }
+        );
+    }
+
+    function convTabActive() {
+        document.querySelector("#new-group-form").className = "hide";
+        document.querySelector("#new-group-tab-item").className = "";
+        document.querySelector("#new-conv-tab-item").className = "active-tab";
+        document.querySelector("#new-conv-form").className = "new-conv-form";
+    }
+    
+    function groupTabActive() {
+        document.querySelector("#new-conv-form").className = "hide";
+        document.querySelector("#new-conv-tab-item").className = "";
+        document.querySelector("#new-group-tab-item").className = "active-tab";
+        document.querySelector("#new-group-form").className = "new-group-form";
+    }
+
+    function showNewConvModal() {
+        var search = document.querySelector("#new-conv-search");
+        var list = document.querySelector("#new-conv-user-list");
+        getUserList(search, list);
+        search.onkeyup = function() {
+            getUserList(search, list);
+        };
+        document.querySelector("#new-conv-modal").className = "modal";
+        setTimeout(function() {
+            document.querySelector("#new-conv-dialog").className = "modal-dialog slide-down";
+        }, 100);
+    }
+
+    function hideNewConvModal() {
+        document.querySelector("#new-conv-search").onkeyup = null;
+        document.querySelector("#new-conv-dialog").className = "modal-dialog";
+        setTimeout(function() {
+            document.querySelector("#new-conv-modal").className = "hide";
+        }, 300);
+    }
+
     function htmlentities(str) {
         return str.replace(/[\u00A0-\u9999<>\&]/gim, function(i) {
             return '&#'+i.charCodeAt(0)+';';
@@ -422,6 +484,14 @@ window.onload = function(event) {
         }
     })()
     
+    document.querySelector("#new-conv-tab-item").onclick = convTabActive;
+
+    document.querySelector("#new-group-tab-item").onclick = groupTabActive;
+
+    document.querySelector("#new-conv").onclick = showNewConvModal;
+
+    document.querySelector("#conv-modal-backdrop").onclick = hideNewConvModal;
+
     document.querySelector("#conv-toolbar-item").onclick = showConversations;
 
     document.querySelector("#img-file-input").onchange = showProfileImgPreview;

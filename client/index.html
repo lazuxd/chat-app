@@ -22,8 +22,8 @@
                 <div class="auth-box" id="auth-box">
                     <div class="auth-tabs">
                         <ul>
-                            <li><a id="signup-tab-link" href="#signup-form">Sign Up</a></li>
-                            <li><a id="login-tab-link" class="active-tab" href="#login-form">Login</a></li>
+                            <li><a id="signup-tab-link">Sign Up</a></li>
+                            <li><a id="login-tab-link" class="active-tab">Login</a></li>
                         </ul>
                     </div>
                     <div class="signup-form" id="signup-form">
@@ -90,10 +90,10 @@
             <header class="toolbar">
                 <ul>
                     <li><a id="conv-toolbar-item" class="active-toolbar-tab">Convorbiri</a></li>
-                    <li><a href="#">Setări</a></li>
+                    <li><a>Setări</a></li>
                     <li class="space"></li>
                     <li class="profile-toolbar-item">
-                        <a id="profile-menu-btn" class="profile-container" href="#">
+                        <a id="profile-menu-btn" class="profile-container">
                             <img id="profile-img" class="profile-img update-profile-img" src="" />
                             <span id="profile-name" class="profile-name update-display-name">Anonim</span>
                         </a>
@@ -104,43 +104,46 @@
                     </li>
                 </ul>
             </header>
-            <div class="modal" id="new-conv-modal">
+            <div class="hide" id="new-conv-modal">
                 <div class="backdrop" id="conv-modal-backdrop">
                 </div>
-                <div class="modal-dialog slide-down" id="new-conv-dialog">
+                <div class="modal-dialog" id="new-conv-dialog">
                     <div class="auth-tabs">
                         <ul>
-                            <li><a id="signup-tab-link" href="#signup-form">Sign Up</a></li>
-                            <li><a id="login-tab-link" class="active-tab" href="#login-form">Login</a></li>
+                            <li><a id="new-conv-tab-item" class="active-tab">Convorbire nouă</a></li>
+                            <li><a id="new-group-tab-item">Grup nou</a></li>
                         </ul>
                     </div>
-                    <div class="signup-form" id="signup-form">
-                        <div class="srv-response" id ="srv-response"></div>
-                        <input type="email" id="signup-email-input" name="email-input" placeholder="Email" />
-                        <div id="check-signup-email"></div>
-                        <input type="password" id="signup-pwd-input" name="pwd-input" placeholder="Password" />
-                        <div id="check-signup-pwd" class="hide">
-                            <span></span>
-                            <div class="secure-level-container">
-                                <div class="secure-level"></div>
+                    <div class="new-conv-form" id="new-conv-form">
+                        <div class="new-conv-form-inner">
+                            <p class="conv-with">Cu:</p>
+                            <div class="user-chooser-container">
+                                <div class="user-chooser">
+                                    <input type="search" id="new-conv-search" class="user-search"/>
+                                    <ul class="user-list" id="new-conv-user-list">
+        
+                                    </ul>
+                                </div>
                             </div>
+                            <button class="conv-start submit-btn">Începe</button>
                         </div>
-                        <input type="password" id="re-pwd-input" name="re-pwd-input" placeholder="Re-Enter Password" />
-                        <div id="check-signup-re-pwd"></div>
-                        <button id="signup-form-btn" class="submit-btn">Sign Up</button>
                     </div>
-                    <div class="login-form active-form" id="login-form">
-                        <div class="srv-response" id="login-srv-response"></div>
-                        <input type="email" id="login-email-input" name="email-input" placeholder="Email"/>
-                        <input type="password" id="login-pwd-input" name="pwd-input" placeholder="Password"/>
-                        <div class="login-options">
-                            <div class="remember-me-container">
-                                <input type="checkbox" id="remember-me" name="remember-me"/>
-                                <label for="remember-me">Remember me</label>
+                    <div class="new-group-form hide" id="new-group-form">
+                        <div class="new-conv-form-inner">
+                            <input type="text" placeholder="Numele grupului" />
+                            <div>
+
                             </div>
-                            <button id="forgot-pwd" class="forgot-pwd">Forgot password?</button>
+                            <div class="user-chooser-container">
+                                <div class="user-chooser">
+                                    <input type="search" id="new-group-search" class="user-search"/>
+                                    <ul class="user-list" id="new-group-user-list">
+        
+                                    </ul>
+                                </div>
+                            </div>
+                            <button class="conv-start submit-btn">Începe</button>
                         </div>
-                        <button id="login-form-btn" class="submit-btn">Login</button>
                     </div>
                 </div>
             </div>

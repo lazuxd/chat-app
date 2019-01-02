@@ -5,6 +5,10 @@ html, body {
     margin: 0;
 }
 
+a {
+    cursor: pointer;
+}
+
 a:link, 
 a:visited,
 a:active {
@@ -355,9 +359,7 @@ a:active {
 
 .toolbar li a.active-toolbar-tab,
 .toolbar li a:hover {
-    font-weight: bold;
     background-color: rgb(73, 211, 121);
-    /* border-bottom: 4px solid lime; */
 }
 
 .space {
@@ -603,6 +605,7 @@ a:active {
     border: 0px solid transparent;
     box-shadow: 4px 4px 4px rgba(0,0,0,0.2);
     background-color: rgb(78, 226, 130);
+    cursor: pointer;
 }
 
 .conv-li {
@@ -630,6 +633,117 @@ a:active {
 .conv-li h3 {
     margin-left: 20px;
     color: #333333;
+}
+
+.user-list {
+    list-style: none;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+    padding: 8px;
+    margin: 8px 0 8px 0;
+}
+
+.user-list li {
+    background-color: white;
+    margin: 0;
+    padding: 4px;
+    box-shadow: 2px 2px 4px 2px rgba(0,0,0,0.2);
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    margin: 8px 0 8px 0;
+    cursor: pointer;
+}
+
+.user-list li:hover,
+.user-list li:active {
+    box-shadow: 2px 2px 8px 2px rgba(0,0,0,0.25);
+}
+
+.user-list li img {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    margin: 0 12px 0 12px;
+}
+
+.user-list li p {
+    margin: 4px 4px 4px 8px;
+    color: #333333;
+}
+
+.logged-in .modal-dialog {
+    width: 80%;
+    height: 70%;
+}
+
+.new-conv-form {
+    flex: 1;
+    display: block;
+    position: relative;
+}
+
+.new-conv-form-inner {
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+}
+
+.conv-with {
+    position: absolute;
+    top: 0;
+    left: 16px;
+}
+
+.user-chooser-container {
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+    padding: 56px 0 56px 0;
+}
+
+.user-chooser {
+    box-sizing: border-box;
+    padding: 8px;
+    border: 1px solid #ccc;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+}
+
+.user-search {
+    width: 80%;
+    margin: 10px 10% 0 10%;
+    padding: 8px 8px;
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    color: #333;
+    background-image: url(./img/search.png);
+    background-position: center right;
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+
+.user-search:focus {
+    box-shadow: 0 0 4px #ccc;
+}
+
+.conv-start {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.new-group-form {
+    flex: 1;
+    display: block;
+    position: relative;
 }
 
 .hide {
