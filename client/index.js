@@ -33,6 +33,7 @@ window.onload = function(event) {
     var loggedIn = document.getElementById('logged-in');
     var profileMenuBtn = document.getElementById('profile-menu-btn');
 
+    var canCreateConv, canCreateGroup, groupNameNotEmpty;
     var chatSocket;
 
 
@@ -230,7 +231,40 @@ window.onload = function(event) {
         }
     }
 
+    function showChatRoom(convId) {
+        var hides = ["#edit-profile", "#conv-list"];
+        hideNewConvModal();
+        for (var hide of hides) {
+            document.querySelector(hide).className = "hide";
+        }
+        document.querySelector("#chat-box").className = "chat-box";
+        post(
+            "../server/api/getMessages.php",
+            {
+                token: sessionStorage.getItem("token") || localStorage.getItem("token"),
+                convId: convId
+            },
+            function(res) {
+                var messages = JSON.parse(res).Messages;
+                var msgArea = document.querySelector("#msg-area");
+                msgArea.innerHTML = "";
+                for (var msg of messages) {
+                    append(msgArea, "<p>"+msg.Message+"</p>");
+                }
+            },
+            function(err) {
+                console.log(err);
+            }
+        );
+    }
+
     function showConversations() {
+        var hides = ["#edit-profile", "#chat-box"];
+        hideNewConvModal();
+        for (var hide of hides) {
+            document.querySelector(hide).className = "hide";
+        }
+        document.querySelector("#conv-ul").innerHTML = "";
         document.querySelector("#conv-list").className = "conv-list-container";
         document.querySelector("#conv-toolbar-item").className = "active-toolbar-tab";
         post(
@@ -247,7 +281,7 @@ window.onload = function(event) {
                 } else {
                     for (var conv of convList.GroupsConv) {
                         var li =
-                            "<li class='conv-li'>" +
+                            "<li class='conv-li' conv-id='"+conv.ConvID+"'>" +
                                 "<img src='"+conv.ImageURL+"'/>" +
                                 "<h3>"+conv.Name+"</h3>" +
                             "</li>"
@@ -256,7 +290,7 @@ window.onload = function(event) {
                     }
                     for (var conv of convList.PrivateConv) {
                         var li =
-                            "<li class='conv-li'>" +
+                            "<li class='conv-li' conv-id='"+conv.ConvID+"'>" +
                                 "<img src='"+conv.ImageURL+"'/>" +
                                 "<h3>"+conv.Name+"</h3>" +
                             "</li>"
@@ -264,11 +298,23 @@ window.onload = function(event) {
                         append(list, li);
                     }
                 }
+                var lis = document.querySelectorAll("#conv-ul li");
+                for (var li of lis) {
+                    li.onclick = showChatRoom.bind(null, li.getAttribute("conv-id"));
+                }
             },
             function(err) {
                 console.log(JSON.parses(err));
             }
         );
+    }
+
+    function checkConvValid() {
+        document.querySelector("#new-conv-btn").className = canCreateConv ? "conv-start submit-btn" : "conv-start submit-btn disabled";
+    }
+    
+    function checkGroupValid() {
+        document.querySelector("#new-group-btn").className = canCreateGroup && groupNameNotEmpty ? "conv-start submit-btn" : "conv-start submit-btn disabled";
     }
 
     function login(res) {
@@ -379,6 +425,8 @@ window.onload = function(event) {
         function onOneSelectedClick() {
             if (!(/.*selected.*/.test(this.className))) {
                 this.className = this.className + " selected";
+                canCreateConv = true;
+                checkConvValid();
                 for (var li of lis) {
                     if (li !== this) {
                         li.className = li.className.replace('selected', '');
@@ -396,9 +444,12 @@ window.onload = function(event) {
         function onMultiSelectedClick() {
             if (!(/.*selected.*/.test(this.className))) {
                 this.className = this.className + " selected";
+                canCreateGroup++;
             } else {
                 this.className = this.className.replace('selected', '');
+                canCreateGroup--;
             }
+            checkGroupValid();
         }
         for (var li of lis) {
             li.onclick = onMultiSelectedClick;
@@ -417,7 +468,7 @@ window.onload = function(event) {
                 users = JSON.parse(res).Users;
                 for (var user of users) {
                     var li =
-                        "<li>" +
+                        "<li user-id='"+user.UserID+"'>" +
                             "<img src='"+user.ImageURL+"'/>" +
                             "<p>"+user.Name+"</p>" +
                         "</li>"
@@ -440,6 +491,8 @@ window.onload = function(event) {
         search.onkeyup = function() {
             getUserList(search, list, attachOneSelectClickEvents);
         };
+        canCreateConv = false;
+        checkConvValid();
         document.querySelector("#new-group-form").className = "hide";
         document.querySelector("#new-group-tab-item").className = "";
         document.querySelector("#new-conv-tab-item").className = "active-tab";
@@ -453,6 +506,8 @@ window.onload = function(event) {
         search.onkeyup = function() {
             getUserList(search, list, attachMultiSelectClickEvents);
         };
+        canCreateGroup = 0;
+        checkGroupValid();
         document.querySelector("#group-img-preview").setAttribute("src", "../server/images/groupImages/groups.png");
         document.querySelector("#new-conv-form").className = "hide";
         document.querySelector("#new-conv-tab-item").className = "";
@@ -523,6 +578,11 @@ window.onload = function(event) {
         }
     })();
     
+    document.querySelector("#group-name-input").onkeyup = function() {
+        groupNameNotEmpty = this.value.length > 0;
+        checkGroupValid();
+    }
+
     document.querySelector("#new-conv-tab-item").onclick = convTabActive;
 
     document.querySelector("#new-group-tab-item").onclick = groupTabActive;
@@ -539,6 +599,52 @@ window.onload = function(event) {
     
     document.querySelector("#group-file-input").onchange = function() {
         showImgPreview(document.querySelector("#group-file-input"), document.querySelector("#group-img-preview"));
+    };
+
+    document.querySelector("#new-conv-btn").onclick = function() {
+        postUpload(
+            "../server/api/newConversation.php",
+            {
+                token: sessionStorage.getItem("token") || localStorage.getItem("token"),
+                type: "private",
+                membersIds: JSON.stringify([document.querySelector("#new-conv-user-list li.selected").getAttribute("user-id")])
+            },
+            function(res) {
+                // console.log(res);
+                showConversations();
+                hideNewConvModal();
+            },
+            function(err) {
+                // console.log(err);
+            }
+        );
+    };
+    
+    document.querySelector("#new-group-btn").onclick = function() {
+        var fileInput = document.querySelector("#group-file-input");
+        var selected = document.querySelectorAll("#new-group-user-list li.selected");
+        var memIds = [];
+        for (var item of selected) {
+            memIds.push(item.getAttribute("user-id"));
+        }
+        postUpload(
+            "../server/api/newConversation.php",
+            {
+                token: sessionStorage.getItem("token") || localStorage.getItem("token"),
+                type: "group",
+                name: document.querySelector("#group-name-input").value,
+                groupImage: fileInput.files && fileInput.files[0],
+                membersIds: JSON.stringify(memIds)
+            },
+            function(res) {
+                // console.log(res);
+                showConversations();
+                hideNewConvModal();
+            },
+            function(err) {
+                // console.log(err);
+            }
+        );
     };
 
     document.querySelector("#edit-profile-save").onclick = function() {

@@ -616,6 +616,7 @@ a:active {
     display: flex;
     justify-content: flex-start;
     align-items: center;
+    cursor: pointer;
 }
 
 .conv-li:hover,
@@ -792,6 +793,12 @@ a:active {
 li.selected {
     background-color: lightblue;
     box-shadow: 2px 2px 8px 2px rgba(0,0,0,0.25);
+}
+
+.disabled {
+    background-color: #777;
+    color: #eee;
+    cursor: not-allowed;
 }
 
 .hide {
