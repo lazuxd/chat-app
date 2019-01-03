@@ -678,6 +678,7 @@ a:active {
 .logged-in .modal-dialog {
     width: 80%;
     height: 70%;
+    max-width: 800px;
 }
 
 .new-conv-form {
@@ -704,6 +705,10 @@ a:active {
     width: 100%;
     height: 100%;
     padding: 56px 0 56px 0;
+}
+
+.new-group-form .user-chooser-container {
+    padding: 128px 0 56px 0;
 }
 
 .user-chooser {
@@ -744,6 +749,49 @@ a:active {
     flex: 1;
     display: block;
     position: relative;
+}
+
+.group-input {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+}
+
+.group-input-item {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    padding: 0 8px;
+    margin: 0 8px;
+}
+
+.group-input-img {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.group-input-img img {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    border: 1px solid #eee;
+    margin: 0 16px 0 0;
+}
+
+.group-input-img input {
+    max-width: 300px;
+}
+
+li.selected {
+    background-color: lightblue;
+    box-shadow: 2px 2px 8px 2px rgba(0,0,0,0.25);
 }
 
 .hide {

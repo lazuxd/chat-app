@@ -26,14 +26,14 @@ if ($_POST["token"] && !$_FILES["profileImg"]) {
         if (!getimagesize($_FILES["profileImg"]["tmp_name"])) {
             throw new Exception("File not an image.");
         }
-        if (!move_uploaded_file($_FILES["profileImg"]["tmp_name"], "../images/$userId/profile.$extension")) {
+        if (!move_uploaded_file($_FILES["profileImg"]["tmp_name"], "../images/profileImages/$userId/profile.$extension")) {
             throw new Exception("Could not upload file.");
         }
-        $imgURL = "../server/images/$userId/profile.$extension";
-        $filesInDir = scandir("../images/$userId/");
+        $imgURL = "../server/images/profileImages/$userId/profile.$extension";
+        $filesInDir = scandir("../images/profileImages/$userId/");
         foreach ($filesInDir as $key => $val ) {
             if (strpos($val, "profile.$extension") !== 0 && $val !== "." && $val !== "..") {
-                unlink("../images/$userId/$val");
+                unlink("../images/profileImages/$userId/$val");
             }
         }
         $db = new PDO("mysql:dbname=ChatApp;host=localhost", username, password);

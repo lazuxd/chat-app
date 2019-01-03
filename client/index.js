@@ -220,10 +220,8 @@ window.onload = function(event) {
         }
     }
 
-    function showProfileImgPreview() {
-        var input = document.querySelector("#img-file-input");
+    function showImgPreview(input, img) {
         if (input.files && input.files[0]) {
-            var img = document.querySelector("#edit-profile-img");
             var reader = new FileReader();
             reader.onload = function(e) {
                 img.setAttribute("src", e.target.result);
@@ -245,7 +243,7 @@ window.onload = function(event) {
                 var list = document.querySelector("#conv-ul");
                 list.innerHTML = "";
                 if (convList.GroupsConv.length === 0 && convList.PrivateConv.length === 0) {
-                    append(list, "<p>Nu există convorbiri.</p>");
+                    append(list, "<p style='margin-left: 30px'>Nu există convorbiri.</p>");
                 } else {
                     for (var conv of convList.GroupsConv) {
                         var li =
@@ -376,7 +374,38 @@ window.onload = function(event) {
         }, 300);
     }
 
-    function getUserList(search, list) {
+    function attachOneSelectClickEvents(ul) {
+        var lis = ul.getElementsByTagName("li");
+        function onOneSelectedClick() {
+            if (!(/.*selected.*/.test(this.className))) {
+                this.className = this.className + " selected";
+                for (var li of lis) {
+                    if (li !== this) {
+                        li.className = li.className.replace('selected', '');
+                    }
+                }
+            }
+        }
+        for (var li of lis) {
+            li.onclick = onOneSelectedClick;
+        }
+    }
+    
+    function attachMultiSelectClickEvents(ul) {
+        var lis = ul.getElementsByTagName("li");
+        function onMultiSelectedClick() {
+            if (!(/.*selected.*/.test(this.className))) {
+                this.className = this.className + " selected";
+            } else {
+                this.className = this.className.replace('selected', '');
+            }
+        }
+        for (var li of lis) {
+            li.onclick = onMultiSelectedClick;
+        }
+    }
+
+    function getUserList(search, list, after) {
         list.innerHTML = "";
         post(
             "../server/api/getUsers.php",
@@ -395,6 +424,7 @@ window.onload = function(event) {
                     ;
                     append(list, li);
                 }
+                after && after(list);
             },
             function(err) {
                 // err = JSON.parse(err);
@@ -404,6 +434,12 @@ window.onload = function(event) {
     }
 
     function convTabActive() {
+        var search = document.querySelector("#new-conv-search");
+        var list = document.querySelector("#new-conv-user-list");
+        getUserList(search, list, attachOneSelectClickEvents);
+        search.onkeyup = function() {
+            getUserList(search, list, attachOneSelectClickEvents);
+        };
         document.querySelector("#new-group-form").className = "hide";
         document.querySelector("#new-group-tab-item").className = "";
         document.querySelector("#new-conv-tab-item").className = "active-tab";
@@ -411,6 +447,13 @@ window.onload = function(event) {
     }
     
     function groupTabActive() {
+        var search = document.querySelector("#new-group-search");
+        var list = document.querySelector("#new-group-user-list");
+        getUserList(search, list, attachMultiSelectClickEvents);
+        search.onkeyup = function() {
+            getUserList(search, list, attachMultiSelectClickEvents);
+        };
+        document.querySelector("#group-img-preview").setAttribute("src", "../server/images/groupImages/groups.png");
         document.querySelector("#new-conv-form").className = "hide";
         document.querySelector("#new-conv-tab-item").className = "";
         document.querySelector("#new-group-tab-item").className = "active-tab";
@@ -418,12 +461,7 @@ window.onload = function(event) {
     }
 
     function showNewConvModal() {
-        var search = document.querySelector("#new-conv-search");
-        var list = document.querySelector("#new-conv-user-list");
-        getUserList(search, list);
-        search.onkeyup = function() {
-            getUserList(search, list);
-        };
+        convTabActive();
         document.querySelector("#new-conv-modal").className = "modal";
         setTimeout(function() {
             document.querySelector("#new-conv-dialog").className = "modal-dialog slide-down";
@@ -432,6 +470,7 @@ window.onload = function(event) {
 
     function hideNewConvModal() {
         document.querySelector("#new-conv-search").onkeyup = null;
+        document.querySelector("#new-group-search").onkeyup = null;
         document.querySelector("#new-conv-dialog").className = "modal-dialog";
         setTimeout(function() {
             document.querySelector("#new-conv-modal").className = "hide";
@@ -482,7 +521,7 @@ window.onload = function(event) {
             function(err) {
             });
         }
-    })()
+    })();
     
     document.querySelector("#new-conv-tab-item").onclick = convTabActive;
 
@@ -494,7 +533,13 @@ window.onload = function(event) {
 
     document.querySelector("#conv-toolbar-item").onclick = showConversations;
 
-    document.querySelector("#img-file-input").onchange = showProfileImgPreview;
+    document.querySelector("#img-file-input").onchange = function() {
+        showImgPreview(document.querySelector("#img-file-input"), document.querySelector("#edit-profile-img"));
+    };
+    
+    document.querySelector("#group-file-input").onchange = function() {
+        showImgPreview(document.querySelector("#group-file-input"), document.querySelector("#group-img-preview"));
+    };
 
     document.querySelector("#edit-profile-save").onclick = function() {
         var imgInput = document.querySelector("#img-file-input");
@@ -538,6 +583,7 @@ window.onload = function(event) {
 
     document.querySelector("#edit-profile-btn").onclick = function() {
         document.querySelector("#chat-box").className = "hide";
+        document.querySelector("#conv-list").className = "hide";
         document.querySelector("#edit-profile").className = "edit-profile";
         var token = sessionStorage.getItem('token') || localStorage.getItem('token');
         post("../server/api/userName.php",

@@ -120,7 +120,7 @@
                             <div class="user-chooser-container">
                                 <div class="user-chooser">
                                     <input type="search" id="new-conv-search" class="user-search"/>
-                                    <ul class="user-list" id="new-conv-user-list">
+                                    <ul class="user-list one-select" id="new-conv-user-list">
         
                                     </ul>
                                 </div>
@@ -130,19 +130,28 @@
                     </div>
                     <div class="new-group-form hide" id="new-group-form">
                         <div class="new-conv-form-inner">
-                            <input type="text" placeholder="Numele grupului" />
-                            <div>
-
+                            <div class="group-input">
+                                <div class="group-input-item">
+                                    <p>Numele Grupului</p>
+                                    <input type="text" />
+                                </div>
+                                <div class="group-input-item">
+                                    <p>Imaginea Grupului</p>
+                                    <div class="group-input-img">
+                                        <img id="group-img-preview" />
+                                        <input type="file" id="group-file-input" />
+                                    </div>
+                                </div>
                             </div>
                             <div class="user-chooser-container">
                                 <div class="user-chooser">
                                     <input type="search" id="new-group-search" class="user-search"/>
-                                    <ul class="user-list" id="new-group-user-list">
+                                    <ul class="user-list multi-select" id="new-group-user-list">
         
                                     </ul>
                                 </div>
                             </div>
-                            <button class="conv-start submit-btn">Începe</button>
+                            <button class="conv-start submit-btn">Creare</button>
                         </div>
                     </div>
                 </div>
