@@ -375,7 +375,6 @@ a:active {
     flex-direction: column;
     justify-content: flex-start;
     align-items: stretch;
-    background-color: rgb(127, 236, 236);
 }
 
 .messages-box {
@@ -405,16 +404,31 @@ a:active {
     display: flex;
     justify-content: flex-start;
     align-items: center;
+    margin-top: 8px;
 }
 .input-box {
     resize: none;
     flex: 1;
     box-sizing: border-box;
-    border: 1px solid #ccc;
-    border-radius: 10px;
-    padding: 15px;
-    margin: 10px;
+    box-shadow: 1px 1px 4px rgba(0,0,0,0.2);
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    padding: 8px;
+    margin: 8px;
+    background-color: white;
+    color: #333;
+    font-size: 18px;
 }
+
+.input-box:focus {
+    box-shadow: 1px 1px 4px 2px rgba(0,0,0,0.2);
+}
+
+.input-container img {
+    width: 32px;
+    height: 32px;
+}
+
 .send-btn {
     margin: 10px;
     background-color: dodgerblue;
@@ -424,7 +438,28 @@ a:active {
     outline: none;
     color: white;
     user-select: none;
+    cursor: pointer;
 }
+
+.right-align {
+    text-align: right;
+}
+
+.left-align {
+    text-align: left;
+}
+
+.msg-name {
+    margin: 0;
+    padding: 0;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.msg-text {
+
+}
+
 .message {
     width: 80%;
     margin: 20px;
@@ -432,7 +467,8 @@ a:active {
     padding: 10px;
     padding-left: 20px;
     background-color: cornsilk;
-    box-shadow: 3px 3px 4px #ccc;
+    box-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+    border: 2px solid #ccc;
     border-radius: 8px;
     position: relative;
 }
@@ -448,14 +484,21 @@ a:active {
     position: absolute;
     left: -32px;
     top: -5px;
+    z-index: 2;
 }
 .message::after {
     content: '';
     display: block;
-    height: 20px;
-    width: 20px;
+    width: 0;
+    height: 0;
+    border-right: 50px solid rgb(0, 0, 0, 0.2);
+    border-bottom: 34px solid transparent;
+    border-bottom-right-radius: 100%;
+    transform: rotate(10deg) ;
     position: absolute;
-    bottom: -20px;
+    left: -36px;
+    top: -7px;
+    z-index: 1;
 }
 .own-message {
     width: 80%;
@@ -465,7 +508,8 @@ a:active {
     margin-right: 40px;
     padding: 10px;
     padding-left: 20px;
-    box-shadow: -3px 3px 4px #ccc;
+    box-shadow: -1px 1px 2px rgba(0,0,0,0.2);
+    border: 2px solid rgba(0,0,0,0.2);;
     border-radius: 8px;
     position: relative;
 }
@@ -481,6 +525,22 @@ a:active {
     position: absolute;
     right: -32px;
     top: -5px;
+    z-index: 2;
+}
+
+.own-message::after {
+    content: '';
+    display: block;
+    width: 0;
+    height: 0;
+    border-left: 50px solid rgb(0, 0, 0, 0.2);
+    border-bottom: 34px solid transparent;
+    border-bottom-left-radius: 100%;
+    transform: rotate(-10deg) ;
+    position: absolute;
+    right: -36px;
+    top: -7px;
+    z-index: 1;
 }
 
 .profile-container {

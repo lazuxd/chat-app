@@ -1,8 +1,8 @@
 window.onload = function(event) {
-    var scrollBox = document.getElementsByClassName('inside-msg-box')[0];
-    var messagesBox = document.getElementsByClassName('inner-box')[0];
+    var scrollBox = document.getElementById('inside-msg-box');
+    var messagesBox = document.getElementById('msg-area');
     var inputBox = document.getElementsByClassName('input-box')[0];
-    var sendBtn = document.getElementsByClassName('send-btn')[0];
+    var sendBtn = document.getElementById('send-btn');
     var signupBtn = document.getElementsByClassName('signup-btn')[0];
     var loginBtn = document.getElementsByClassName('login-btn')[0];
     var signupTabLink = document.getElementById('signup-tab-link');
@@ -37,14 +37,17 @@ window.onload = function(event) {
     var chatSocket;
 
 
-    // who = 0 => My own message
-    // who = 1 => Others message
-    function newMessage(data, who) {
+    function newMessage(msg) {
+        if (msg.status === "failure") {
+            console.log(msg.errorMessage);
+            return;
+        }
         var el = document.createElement('div');
-        el.className = who === 0 ? 'own-message' : 'message';
-        el.innerHTML = data;
+        var align = Number(msg.Me) === 1 ? 'right-align' : 'left-align';
+        el.className = Number(msg.Me) === 1 ? 'own-message' : 'message';
+        el.innerHTML = "<p class='msg-name "+align+"'>"+msg.Name+"</p><p class='msg-text'>"+msg.Message+"</p>";
         messagesBox.appendChild(el);
-        scrollToBottom()
+        scrollToBottom();
     }
 
     function scrollToBottom() {
@@ -232,6 +235,24 @@ window.onload = function(event) {
     }
 
     function showChatRoom(convId) {
+        if (chatSocket && typeof chatSocket === "object") {
+            chatSocket.close();
+        } 
+        chatSocket = new WebSocket('ws://localhost:8080/chat');
+        chatSocket.onopen = function(event) {
+            chatSocket.send(JSON.stringify({
+                type: "open",
+                token: sessionStorage.getItem("token") || localStorage.getItem("token"),
+                convId: convId
+            }));
+        }
+        chatSocket.onmessage = function(event) {
+            newMessage(JSON.parse(event.data));
+        }
+        chatSocket.onclose = function(event) {
+        }
+        chatSocket.onerror = function(event) {
+        }
         var hides = ["#edit-profile", "#conv-list"];
         hideNewConvModal();
         for (var hide of hides) {
@@ -249,7 +270,8 @@ window.onload = function(event) {
                 var msgArea = document.querySelector("#msg-area");
                 msgArea.innerHTML = "";
                 for (var msg of messages) {
-                    append(msgArea, "<p>"+msg.Message+"</p>");
+                    newMessage(msg);
+                    // append(msgArea, "<p>"+msg.Message+"</p>");
                 }
             },
             function(err) {
@@ -354,20 +376,6 @@ window.onload = function(event) {
         notLoggedIn.className = "hide";
         loggedIn.className = "logged-in";
         showConversations();
-        // chatSocket = new WebSocket('ws://localhost:8080/chat');
-        // chatSocket.onopen = function(event) {
-        //     console.log("OPEN", event);
-        // }
-        // chatSocket.onmessage = function(event) {
-        //     newMessage(event.data, 1);
-        //     console.log("MESSAGE", event);
-        // }
-        // chatSocket.onclose = function(event) {
-        //     console.log("CLOSE", event);
-        // }
-        // chatSocket.onerror = function(event) {
-        //     console.log("ERROR", event);
-        // }
     }
 
     function showAuthModal() {
@@ -793,8 +801,11 @@ window.onload = function(event) {
     }
 
     sendBtn.onclick = function() {
-        chatSocket.send(inputBox.value);
-        newMessage(inputBox.value, 0);
+        chatSocket.send(JSON.stringify({
+            type: "message",
+            token: sessionStorage.getItem("token") || localStorage.getItem("token"),
+            msg: inputBox.value
+        }));
         inputBox.value = '';
     }
 

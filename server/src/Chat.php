@@ -4,9 +4,9 @@ namespace ChatApp;
 use Ratchet\MessageComponentInterface;
 use Ratchet\ConnectionInterface;
 
-require_once("../src/data.php");
-require_once("../src/functions.php");
-require_once("../src/checkToken.php");
+require_once("data.php");
+require_once("functions.php");
+require_once("checkToken.php");
 
 
 class Chat implements MessageComponentInterface {
@@ -17,8 +17,8 @@ class Chat implements MessageComponentInterface {
     public function __construct() {
         $this->conversations = [];
         $this->connInfo = [];
-        $this->db = new PDO("mysql:dbname=ChatApp;host=localhost", username, password);
-        $this->db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $this->db = new \PDO("mysql:dbname=ChatApp;host=localhost", username, password);
+        $this->db->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
     }
 
     public function onOpen(ConnectionInterface $conn) {
