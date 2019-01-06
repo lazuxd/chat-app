@@ -14,16 +14,39 @@
             </div>
         </div>
         <div class="not-logged-in" id ="not-logged-in">
-            <button class="btn signup-btn">Sign Up</button>
-            <button class="btn login-btn">Login</button>
+            <div class="first-page">
+                <div class="not-logged-in-header">
+                    <button class="active-lang" id="en-lang-btn"><img src="./img/en.png" /></button>
+                    <button id="ro-lang-btn"><img src="./img/ro.png" /></button>
+                </div>
+                <h1 class="first-page-title title">A simple chat app to talk to your friends.</h1>
+                <div class="first-page-buttons">
+                    <button class="btn signup-btn sign-up">Sign Up</button>
+                    <button class="btn login-btn log-in">Login</button>
+                </div>
+                <div class="icons-row">
+                    <div class="icons-cell">
+                        <img src="./img/tick-inside-circle.png" />
+                        <h2 class="simple">Simple</h2>
+                    </div>
+                    <div class="icons-cell">
+                        <img src="./img/free-delivery-truck.png" />
+                        <h2 class="free">Free</h2>
+                    </div>
+                    <div class="icons-cell">
+                        <img src="./img/speedometer.png" />
+                        <h2 class="efficient">Efficient</h2>
+                    </div>
+                </div>
+            </div>
             <div class="hide" id="auth-modal">
                 <div class="backdrop" id="auth-modal-backdrop">
                 </div>
                 <div class="auth-box" id="auth-box">
                     <div class="auth-tabs">
                         <ul>
-                            <li><a id="signup-tab-link">Sign Up</a></li>
-                            <li><a id="login-tab-link" class="active-tab">Login</a></li>
+                            <li><a id="signup-tab-link" class="sign-up">Sign Up</a></li>
+                            <li><a id="login-tab-link" class="active-tab log-in">Login</a></li>
                         </ul>
                     </div>
                     <div class="signup-form" id="signup-form">
@@ -39,7 +62,7 @@
                         </div>
                         <input type="password" id="re-pwd-input" name="re-pwd-input" placeholder="Re-Enter Password" />
                         <div id="check-signup-re-pwd"></div>
-                        <button id="signup-form-btn" class="submit-btn">Sign Up</button>
+                        <button id="signup-form-btn" class="submit-btn sign-up">Sign Up</button>
                     </div>
                     <div class="login-form active-form" id="login-form">
                         <div class="srv-response" id="login-srv-response"></div>
@@ -48,11 +71,11 @@
                         <div class="login-options">
                             <div class="remember-me-container">
                                 <input type="checkbox" id="remember-me" name="remember-me"/>
-                                <label for="remember-me">Remember me</label>
+                                <label for="remember-me" class="remember-me">Remember me</label>
                             </div>
                             <button id="forgot-pwd" class="forgot-pwd">Forgot password?</button>
                         </div>
-                        <button id="login-form-btn" class="submit-btn">Login</button>
+                        <button id="login-form-btn" class="submit-btn log-in">Login</button>
                     </div>
                 </div>
             </div>
@@ -60,11 +83,11 @@
                 <div class="backdrop" id="forgot-pwd-modal-backdrop">
                 </div>
                 <div class="forgot-pwd-form modal-dialog" id="forgot-pwd-form">
-                    <h3>Forgot Password?</h3>
+                    <h3 class="forgot-pwd">Forgot Password?</h3>
                     <div class="srv-response" id ="srv-response-forgot-pwd"></div>
-                    <p>We'll send you a verification email to reset your password.</p>
+                    <p class="forgot-pwd-msg">We'll send you a verification email to reset your password.</p>
                     <input type="email" id="forgot-pwd-email-input" name="forgot-pwd-email-input" placeholder="Email" />
-                    <button id="send-reset-pwd-email" class="submit-btn">Send</button>
+                    <button id="send-reset-pwd-email" class="submit-btn send">Send</button>
                 </div>
             </div>
             <div class="modal hide" id="reset-pwd-modal">
@@ -89,8 +112,8 @@
         <div class="logged-in hide" id="logged-in">
             <header class="toolbar">
                 <ul>
-                    <li><a id="conv-toolbar-item" class="active-toolbar-tab">Convorbiri</a></li>
-                    <li><a>Setări</a></li>
+                    <li><a id="conv-toolbar-item" class="active-toolbar-tab toolbar-conv">Convorbiri</a></li>
+                    <li><a id="settings-toolbar-item" class="toolbar-settings">Setări</a></li>
                     <li class="space"></li>
                     <li class="profile-toolbar-item">
                         <a id="profile-menu-btn" class="profile-container">
@@ -98,8 +121,8 @@
                             <span id="profile-name" class="profile-name update-display-name">Anonim</span>
                         </a>
                         <div id="profile-dropdown" class="profile-dropdown">
-                            <button id="edit-profile-btn" class="link-btn">Editare Profil</button>
-                            <button id="logout-btn" class="logout-btn">Logout</button>
+                            <button id="edit-profile-btn" class="menu-btn toolbar-profile-edit">Editare Profil</button>
+                            <button id="logout-btn" class="menu-btn toolbar-logout">Logout</button>
                         </div>
                     </li>
                 </ul>
@@ -110,8 +133,8 @@
                 <div class="modal-dialog" id="new-conv-dialog">
                     <div class="auth-tabs">
                         <ul>
-                            <li><a id="new-conv-tab-item" class="active-tab">Convorbire nouă</a></li>
-                            <li><a id="new-group-tab-item">Grup nou</a></li>
+                            <li><a id="new-conv-tab-item" class="active-tab new-conv-tab">Convorbire nouă</a></li>
+                            <li><a id="new-group-tab-item" class="new-group">Grup nou</a></li>
                         </ul>
                     </div>
                     <div class="new-conv-form" id="new-conv-form">
@@ -125,18 +148,18 @@
                                     </ul>
                                 </div>
                             </div>
-                            <button class="conv-start submit-btn" id="new-conv-btn">Începe</button>
+                            <button class="conv-start submit-btn new-conv-create" id="new-conv-btn">Începe</button>
                         </div>
                     </div>
                     <div class="new-group-form hide" id="new-group-form">
                         <div class="new-conv-form-inner">
                             <div class="group-input">
                                 <div class="group-input-item">
-                                    <p>Numele Grupului</p>
+                                    <p class="group-name">Numele Grupului</p>
                                     <input type="text" id="group-name-input" />
                                 </div>
                                 <div class="group-input-item">
-                                    <p>Imaginea Grupului</p>
+                                    <p class="group-img">Imaginea Grupului</p>
                                     <div class="group-input-img">
                                         <img id="group-img-preview" />
                                         <input type="file" id="group-file-input" />
@@ -151,28 +174,42 @@
                                     </ul>
                                 </div>
                             </div>
-                            <button class="conv-start submit-btn" id="new-group-btn">Creare</button>
+                            <button class="conv-start submit-btn new-conv-create" id="new-group-btn">Creare</button>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="edit-profile hide" id="edit-profile">
-                <h3>Profile Image</h3>
+                <h3 class="edit-prifile-img">Profile Image</h3>
                 <div class="edit-img-div">
                     <img id="edit-profile-img" class="edit-profile-img update-profile-img" src="" />
                     <input id="img-file-input" type="file" />
                 </div>
-                <h3>Display Name</h3>
+                <h3 class="edit-profile-name">Display Name</h3>
                 <div class="edit-name-div">
                     <input id="edit-name-input" type="text"/>
                 </div>
-                <button id="edit-profile-save" class="btn btn2">Save</button>
+                <button id="edit-profile-save" class="btn btn2 settings-save">Save</button>
             </div>
             <div class="conv-list-container hide" id="conv-list">
                 <ul class="conv-list" id="conv-ul">
 
                 </ul>
                 <button class="float-btn" id="new-conv">&plus;</button>
+            </div>
+            <div class="settings-page hide" id="settings-page">
+                <div class="setting-item">
+                    <h3 class="settings-color">Culoare</h3>
+                    <input type="color" id="color-input" value="#4ee282" />
+                </div>
+                <div class="setting-item">
+                    <h3 class="settings-lang">Limbă</h3>
+                    <select id="lang-select">
+                        <option value="en">English</option>
+                        <option value="ro">Română</option>
+                    </select>
+                </div>
+                <button class="btn btn2 settings-save" id="settings-btn">Salvează</button>
             </div>
             <div class="chat-box hide" id="chat-box">
                 <div class="messages-box">

@@ -1,4 +1,117 @@
 window.onload = function(event) {
+
+    var translate = {
+        "title": {
+            "en": "A simple chat app to talk to your friends.",
+            "ro": "O simplă aplicație de chat pentru a vorbi cu prietenii."
+        },
+        "sign-up": {
+            "en": "Sign Up",
+            "ro": "Creează Cont"
+        },
+        "log-in": {
+            "en": "Login",
+            "ro": "Intră în cont"
+        },
+        "simple": {
+            "en": "Simple",
+            "ro": "Simplu"
+        },
+        "free": {
+            "en": "Free",
+            "ro": "Gratuit"
+        },
+        "efficient": {
+            "en": "Efficient",
+            "ro": "Eficient"
+        },
+        "remember-me": {
+            "en": "Remember me",
+            "ro": "Ține-mă minte"
+        },
+        "forgot-pwd": {
+            "en": "Forgot password?",
+            "ro": "Ai uitat parola?"
+        },
+        "login-success": {
+            "en": "Login successful!",
+            "ro": "Autentificare reușită!"
+        },
+        "toolbar-conv": {
+            "en": "Conversations",
+            "ro": "Convorbiri"
+        },
+        "toolbar-settings": {
+            "en": "Settings",
+            "ro": "Setări"
+        },
+        "toolbar-profile-edit": {
+            "en": "Edit Profile",
+            "ro": "Editare Profil"
+        },
+        "toolbar-logout": {
+            "en": "Logout",
+            "ro": "Ieșire"
+        },
+        "new-conv-tab": {
+            "en": "New conversation",
+            "ro": "Convorbire nouă"
+        },
+        "new-group": {
+            "en": "New group",
+            "ro": "Grup nou"
+        },
+        "new-conv-with": {
+            "en": "With:",
+            "ro": "Cu:"
+        },
+        "group-name": {
+            "en": "Group Name",
+            "ro": "Numele Grupului"
+        },
+        "group-img": {
+            "en": "Group Image",
+            "ro": "Imaginea Grupului"
+        },
+        "new-conv-create": {
+            "en": "Done",
+            "ro": "Gata"
+        },
+        "edit-prifile-img": {
+            "en": "Profile Image",
+            "ro": "Imaginea de Profil"
+        },
+        "edit-profile-name": {
+            "en": "Display Name",
+            "ro": "Numele de Afișat"
+        },
+        "settings-save": {
+            "en": "Save",
+            "ro": "Salvare"
+        },
+        "settings-color": {
+            "en": "Color",
+            "ro": "Culoare"
+        },
+        "settings-lang": {
+            "en": "Language",
+            "ro": "Limbă"
+        },
+        "forgot-pwd-msg": {
+            "en": "We'll send you a verification email to reset your password.",
+            "ro": "Vei primi un email de verificare pentru a-ți reseta parola."
+        },
+        "send": {
+            "en": "Send",
+            "ro": "Trimite"
+        },
+        "reset-pwd": {
+            "en": "Reset Password",
+            "ro": "Resetează Parola"
+        }
+    };
+
+
     var scrollBox = document.getElementById('inside-msg-box');
     var messagesBox = document.getElementById('msg-area');
     var inputBox = document.getElementsByClassName('input-box')[0];
@@ -37,6 +150,32 @@ window.onload = function(event) {
     var chatSocket;
 
 
+    // document.styleSheets[0].cssRules[1].style.backgroundColor = "rgb(255, 0, 0)";
+    // // console.log(document.styleSheets[0].cssRules[2]);
+    // // console.log(document.styleSheets[0].cssRules[3]);
+
+    function setLanguage(lang) {
+        if (!lang) lang = "en";
+        document.querySelector("#lang-select").value = lang;
+        var keys = Object.keys(translate);
+        for (var key of keys) {
+            var items = document.getElementsByClassName(key);
+            for (var item of items) {
+                item.innerHTML = translate[key][lang];
+            }
+        }
+    }
+    
+    function setAppColor(color) {
+        if (color) {
+            document.querySelector("#color-input").value = color;
+            var s = document.styleSheets[0];
+            s.cssRules[1].style.backgroundColor = color;
+            s.cssRules[2].style.backgroundColor = color;
+            s.cssRules[3].style.backgroundColor = color;
+        }
+    }
+
     function newMessage(msg) {
         if (msg.status === "failure") {
             console.log(msg.errorMessage);
@@ -45,7 +184,7 @@ window.onload = function(event) {
         var el = document.createElement('div');
         var align = Number(msg.Me) === 1 ? 'right-align' : 'left-align';
         el.className = Number(msg.Me) === 1 ? 'own-message' : 'message';
-        el.innerHTML = "<p class='msg-name "+align+"'>"+msg.Name+"</p><p class='msg-text'>"+msg.Message+"</p>";
+        el.innerHTML = "<p class='msg-name "+align+"'>"+htmlentities(msg.Name)+"</p><p class='msg-text'>"+htmlentities(msg.Message)+"</p>";
         messagesBox.appendChild(el);
         scrollToBottom();
     }
@@ -170,7 +309,11 @@ window.onload = function(event) {
             return true;
         }
         if (!emailValidRE.test(val)) {
-            output.innerHTML = "Invalid email address";
+            if (localStorage.getItem("lang") === "ro") {
+                output.innerHTML = "Adresa de email nu este validă";
+            } else {
+                output.innerHTML = "Invalid email address";
+            }
             output.className = "danger";
             return true;
         } else {
@@ -186,20 +329,37 @@ window.onload = function(event) {
             output.className = "hide";
             return true;
         }
+        var lang = localStorage.getItem("lang");
         if (val.length <= 5 || nrOfMatches(val) <= 1) { // weak
-            output.firstElementChild.innerHTML = "Weak password";
+            if (lang === "ro") {
+                output.firstElementChild.innerHTML = "Parolă slabă";
+            } else {
+                output.firstElementChild.innerHTML = "Weak password";
+            }
             output.className = "pwd-secure weak";
             return true;
         } else if (val.length <= 8 || nrOfMatches(val) <= 2) { // medium
-            output.firstElementChild.innerHTML = "Medium password";
+            if (lang === "ro") {
+                output.firstElementChild.innerHTML = "Parolă medie";
+            } else {
+                output.firstElementChild.innerHTML = "Medium password";
+            }
             output.className = "pwd-secure medium";
             return false;
         } else if (val.length < 10 || nrOfMatches(val) <= 3) { // good
-            output.firstElementChild.innerHTML = "Good password";
+            if (lang === "ro") {
+                output.firstElementChild.innerHTML = "Parolă bună";
+            } else {
+                output.firstElementChild.innerHTML = "Good password";
+            }
             output.className = "pwd-secure good";
             return false;
         } else { // strong
-            output.firstElementChild.innerHTML = "Strong password";
+            if (lang === "ro") {
+                output.firstElementChild.innerHTML = "Parolă puternică";
+            } else {
+                output.firstElementChild.innerHTML = "Strong password";
+            }
             output.className = "pwd-secure strong";
             return false;
         }
@@ -214,7 +374,11 @@ window.onload = function(event) {
             return true;
         }
         if (pwd1 !== pwd2) {
-            output.innerHTML = "Passwords don't match"
+            if (localStorage.getItem("lang") === "ro") {
+                output.innerHTML = "Parolele nu se potrivesc"
+            } else {
+                output.innerHTML = "Passwords don't match"
+            }
             output.className = "danger"
             return true;
         } else {
@@ -234,7 +398,18 @@ window.onload = function(event) {
         }
     }
 
-    function showChatRoom(convId) {
+    function showSettingsPage() {
+        var hides = ["#new-conv-modal", "#edit-profile", "#conv-list", "#chat-box"];
+        for (var hide of hides) {
+            document.querySelector(hide).className = "hide";
+        }
+        document.querySelector("#conv-toolbar-item").classList.remove("active-toolbar-tab");
+        document.querySelector("#settings-page").className = "settings-page";
+        document.querySelector("#settings-toolbar-item").classList.add("active-toolbar-tab");
+    }
+
+    function showChatRoom(convId, name) {
+        document.getElementsByTagName("title")[0].innerHTML = name + " - ChatApp";
         if (chatSocket && typeof chatSocket === "object") {
             chatSocket.close();
         } 
@@ -281,14 +456,16 @@ window.onload = function(event) {
     }
 
     function showConversations() {
-        var hides = ["#edit-profile", "#chat-box"];
+        document.getElementsByTagName("title")[0].innerHTML = "ChatApp";
+        var hides = ["#edit-profile", "#chat-box", "#settings-page"];
         hideNewConvModal();
         for (var hide of hides) {
             document.querySelector(hide).className = "hide";
         }
         document.querySelector("#conv-ul").innerHTML = "";
         document.querySelector("#conv-list").className = "conv-list-container";
-        document.querySelector("#conv-toolbar-item").className = "active-toolbar-tab";
+        document.querySelector("#settings-toolbar-item").classList.remove("active-toolbar-tab");
+        document.querySelector("#conv-toolbar-item").classList.add("active-toolbar-tab");
         post(
             "../server/api/getConversations.php",
             {
@@ -303,7 +480,7 @@ window.onload = function(event) {
                 } else {
                     for (var conv of convList.GroupsConv) {
                         var li =
-                            "<li class='conv-li' conv-id='"+conv.ConvID+"'>" +
+                            "<li class='conv-li' conv-id='"+conv.ConvID+"' conv-name='"+conv.Name+"'>" +
                                 "<img src='"+conv.ImageURL+"'/>" +
                                 "<h3>"+conv.Name+"</h3>" +
                             "</li>"
@@ -312,7 +489,7 @@ window.onload = function(event) {
                     }
                     for (var conv of convList.PrivateConv) {
                         var li =
-                            "<li class='conv-li' conv-id='"+conv.ConvID+"'>" +
+                            "<li class='conv-li' conv-id='"+conv.ConvID+"' conv-name='"+conv.Name+"'>" +
                                 "<img src='"+conv.ImageURL+"'/>" +
                                 "<h3>"+conv.Name+"</h3>" +
                             "</li>"
@@ -322,7 +499,7 @@ window.onload = function(event) {
                 }
                 var lis = document.querySelectorAll("#conv-ul li");
                 for (var li of lis) {
-                    li.onclick = showChatRoom.bind(null, li.getAttribute("conv-id"));
+                    li.onclick = showChatRoom.bind(null, li.getAttribute("conv-id"), li.getAttribute("conv-name"));
                 }
             },
             function(err) {
@@ -332,11 +509,19 @@ window.onload = function(event) {
     }
 
     function checkConvValid() {
-        document.querySelector("#new-conv-btn").className = canCreateConv ? "conv-start submit-btn" : "conv-start submit-btn disabled";
+        if (!canCreateConv) {
+            document.querySelector("#new-conv-btn").classList.add("disabled");
+        } else {
+            document.querySelector("#new-conv-btn").classList.remove("disabled");
+        }
     }
     
     function checkGroupValid() {
-        document.querySelector("#new-group-btn").className = canCreateGroup && groupNameNotEmpty ? "conv-start submit-btn" : "conv-start submit-btn disabled";
+        if (canCreateGroup && groupNameNotEmpty) {
+            document.querySelector("#new-group-btn").classList.remove("disabled");
+        } else {
+            document.querySelector("#new-group-btn").classList.add("disabled");
+        }
     }
 
     function login(res) {
@@ -502,8 +687,8 @@ window.onload = function(event) {
         canCreateConv = false;
         checkConvValid();
         document.querySelector("#new-group-form").className = "hide";
-        document.querySelector("#new-group-tab-item").className = "";
-        document.querySelector("#new-conv-tab-item").className = "active-tab";
+        document.querySelector("#new-group-tab-item").classList.remove("active-tab");
+        document.querySelector("#new-conv-tab-item").classList.add("active-tab");
         document.querySelector("#new-conv-form").className = "new-conv-form";
     }
     
@@ -518,8 +703,8 @@ window.onload = function(event) {
         checkGroupValid();
         document.querySelector("#group-img-preview").setAttribute("src", "../server/images/groupImages/groups.png");
         document.querySelector("#new-conv-form").className = "hide";
-        document.querySelector("#new-conv-tab-item").className = "";
-        document.querySelector("#new-group-tab-item").className = "active-tab";
+        document.querySelector("#new-conv-tab-item").classList.remove("active-tab");
+        document.querySelector("#new-group-tab-item").classList.add("active-tab");
         document.querySelector("#new-group-form").className = "new-group-form";
     }
 
@@ -559,13 +744,23 @@ window.onload = function(event) {
                 key: searchParams.get('key')
             },
             function(res) {
-                msgModalTitle.innerHTML = "Account activated successfully";
-                msgModalBody.innerHTML = "Your account was successfully activated! Now you can log into your account.";
+                if (localStorage.getItem("lang") === "ro") {
+                    msgModalTitle.innerHTML = "Cont activat cu succes";
+                    msgModalBody.innerHTML = "Contul dvs. a fost activat cu succes! Acum puteți să intrați în cont.";
+                } else {
+                    msgModalTitle.innerHTML = "Account activated successfully";
+                    msgModalBody.innerHTML = "Your account was successfully activated! Now you can log into your account.";
+                }
                 msgModal.className = "msg-modal";
             },
             function(err) {
-                msgModalTitle.innerHTML = "Activation failed";
-                msgModalBody.innerHTML = "An error ocurred while activating your account! Error message: " + JSON.parse(err).errorMessage;
+                if (localStorage.getItem("lang") === "ro") {
+                    msgModalTitle.innerHTML = "Activarea contului a eșuat";
+                    msgModalBody.innerHTML = "O eroare a avut loc în timpul activării contului! Mesajul de eroare: " + JSON.parse(err).errorMessage;
+                } else {
+                    msgModalTitle.innerHTML = "Activation failed";
+                    msgModalBody.innerHTML = "An error ocurred while activating your account! Error message: " + JSON.parse(err).errorMessage;
+                }
                 msgModal.className = "msg-modal";
             }
         );
@@ -585,7 +780,35 @@ window.onload = function(event) {
             });
         }
     })();
+
+    setLanguage(localStorage.getItem("lang"));
+    setAppColor(localStorage.getItem("app-color"));
     
+    document.querySelector("#en-lang-btn").onclick = function() {
+        localStorage.setItem("lang", "en");
+        this.classList.add("active-lang");
+        document.querySelector("#ro-lang-btn").classList.remove("active-lang");
+        setLanguage("en");
+    }
+    
+    document.querySelector("#ro-lang-btn").onclick = function() {
+        localStorage.setItem("lang", "ro");
+        this.classList.add("active-lang");
+        document.querySelector("#en-lang-btn").classList.remove("active-lang");
+        setLanguage("ro");
+    }
+
+    document.querySelector("#settings-btn").onclick = function() {
+        var color = document.querySelector("#color-input").value;
+        var lang = document.querySelector("#lang-select").value;
+        localStorage.setItem("app-color", color);
+        localStorage.setItem("lang", lang);
+        setLanguage(lang);
+        setAppColor(color);
+    }
+
+    document.querySelector("#settings-toolbar-item").onclick = showSettingsPage;
+
     document.querySelector("#group-name-input").onkeyup = function() {
         groupNameNotEmpty = this.value.length > 0;
         checkGroupValid();
@@ -610,6 +833,7 @@ window.onload = function(event) {
     };
 
     document.querySelector("#new-conv-btn").onclick = function() {
+        if (this.classList.contains("disabled")) return;
         postUpload(
             "../server/api/newConversation.php",
             {
@@ -629,6 +853,7 @@ window.onload = function(event) {
     };
     
     document.querySelector("#new-group-btn").onclick = function() {
+        if (this.classList.contains("disabled")) return;
         var fileInput = document.querySelector("#group-file-input");
         var selected = document.querySelectorAll("#new-group-user-list li.selected");
         var memIds = [];
@@ -698,6 +923,9 @@ window.onload = function(event) {
     document.querySelector("#edit-profile-btn").onclick = function() {
         document.querySelector("#chat-box").className = "hide";
         document.querySelector("#conv-list").className = "hide";
+        document.querySelector("#settings-page").className = "hide";
+        document.querySelector("#conv-toolbar-item").classList.remove("active-tab");
+        document.querySelector("#settings-toolbar-item").classList.remove("active-tab");
         document.querySelector("#edit-profile").className = "edit-profile";
         var token = sessionStorage.getItem('token') || localStorage.getItem('token');
         post("../server/api/userName.php",
@@ -731,6 +959,7 @@ window.onload = function(event) {
 
     document.querySelector("#send-reset-pwd-email").onclick = function() {
         var email = document.querySelector("#forgot-pwd-email-input").value;
+        var lang = localStorage.getItem("lang");
         post('../server/api/sendForgotPwdEmail.php',
             {
                 email: document.querySelector("#forgot-pwd-email-input").value
@@ -738,21 +967,22 @@ window.onload = function(event) {
             function(res) {
                 var resDiv = document.querySelector("#srv-response-forgot-pwd");
                 resDiv.className = "success-msg";
-                resDiv.innerHTML = "Email sent successfully!";
+                resDiv.innerHTML = lang === "ro" ? "Email-ul a fost trimis cu succes!" : "Email sent successfully!";
             },
             function(err) {
                 var resDiv = document.querySelector("#srv-response-forgot-pwd");
                 resDiv.className = "failure-msg";
                 // resDiv.innerHTML = err;
-                resDiv.innerHTML = "Error sending email!";
+                resDiv.innerHTML = lang === "ro" ? "A avut loc o eroare!" : "Error sending email!";
             }
         );
     }
 
     document.querySelector("#reset-pwd").onclick = function() {
         var resDiv = document.querySelector("#srv-response-reset-pwd");
+        var lang = localStorage.getItem("lang");
         if (pwdResetErr || pwdMatchResetErr) {
-            resDiv.innerHTML = "Completați corect câmpurile!";
+            resDiv.innerHTML = lang === "ro" ? "Completați corect câmpurile!" : "Fill in the fields correctly!";
             resDiv.className = "danger";
             return;
         }
@@ -765,12 +995,12 @@ window.onload = function(event) {
             },
             function(res) {
                 resDiv.className = "success-msg";
-                resDiv.innerHTML = "The password has been successfully reset!";
+                resDiv.innerHTML = lang === "ro" ? "Parola a fost resetată cu succes!" : "The password has been successfully reset!";
             },
             function(err) {
                 resDiv.className = "failure-msg";
                 // resDiv.innerHTML = err;
-                resDiv.innerHTML = "Could not reset password!!";
+                resDiv.innerHTML = lang === "ro" ? "Nu s-a putut reseta parola!" : "Could not reset password!!";
             }
         );
     }
@@ -798,6 +1028,16 @@ window.onload = function(event) {
         var profileDropdown = document.getElementById("profile-dropdown");
         profileDropdown.className = !profileDropdownOpened ? "profile-dropdown show" : "profile-dropdown";
         profileDropdownOpened = !profileDropdownOpened;
+        if (profileDropdownOpened) {
+            setTimeout(function() {
+                function closeProfileDropdown() {
+                    profileDropdown.className = "profile-dropdown";
+                    profileDropdownOpened = false;
+                    document.removeEventListener("click", closeProfileDropdown);
+                }
+                document.addEventListener("click", closeProfileDropdown);
+            }, 0);
+        }
     }
 
     sendBtn.onclick = function() {
@@ -811,32 +1051,32 @@ window.onload = function(event) {
 
     signupTabLink.onclick = function(ev) {
         loginForm.className = "login-form";
-        loginTabLink.className = "";
+        loginTabLink.classList.remove("active-tab");
         signupForm.className = "signup-form active-form";
-        signupTabLink.className = "active-tab";
+        signupTabLink.classList.add("active-tab");
     }
 
     loginTabLink.onclick = function() {
         signupForm.className = "signup-form";
-        signupTabLink.className = "";
+        signupTabLink.classList.remove("active-tab");
         loginForm.className = "login-form active-form";
-        loginTabLink.className = "active-tab";
+        loginTabLink.classList.add("active-tab");
     }
 
     backdrop.onclick = hideAuthModal;
 
     signupBtn.onclick = function() {
         loginForm.className = "login-form";
-        loginTabLink.className = "";
+        loginTabLink.classList.remove("active-tab");
         signupForm.className = "signup-form active-form";
-        signupTabLink.className = "active-tab";
+        signupTabLink.classList.add("active-tab");
         showAuthModal();
     }
     loginBtn.onclick = function() {
         signupForm.className = "signup-form";
-        signupTabLink.className = "";
+        signupTabLink.classList.remove("active-tab");
         loginForm.className = "login-form active-form";
-        loginTabLink.className = "active-tab";
+        loginTabLink.classList.add("active-tab");
         showAuthModal();
     }
     
@@ -855,7 +1095,11 @@ window.onload = function(event) {
 
     signupFormBtn.onclick = function(ev) {
         if (emailErr || pwdErr || pwdMatchErr) {
-            srvResponse.innerHTML = "Completați corect câmpurile!";
+            if (localStorage.getItem("lang") == "ro") {
+                srvResponse.innerHTML = "Completați corect câmpurile!";
+            } else {
+                srvResponse.innerHTML = "Fill in the fields correctly!";
+            }
             srvResponse.className = "danger";
             return;
         }
@@ -868,7 +1112,11 @@ window.onload = function(event) {
             },
             function(result) {
                 srvResponse.className = "success-msg";
-                srvResponse.innerHTML = "Signup succesfull! An activation email was sent to you.";
+                if (localStorage.getItem("lang") == "ro") {
+                    srvResponse.innerHTML = "Cont creat cu succes! A fost trimis un email de activare către dvs.";
+                } else {
+                    srvResponse.innerHTML = "Signup succesfull! An activation email was sent to you.";
+                }
                 setTimeout(function() {srvResponse.className = "hide";}, 3000);
             },
             function(error) {
@@ -881,7 +1129,11 @@ window.onload = function(event) {
     
     loginFormBtn.onclick = function(ev) {
         if (!loginEmailInput.value || !loginPwdInput.value) {
-            loginSrvResponse.innerHTML = "Completați corect câmpurile!";
+            if (localStorage.getItem("lang") == "ro") {
+                loginSrvResponse.innerHTML = "Completați corect câmpurile!";
+            } else {
+                loginSrvResponse.innerHTML = "Fill in the fields correctly!";
+            }
             loginSrvResponse.className = "danger";
             return;
         }
@@ -901,7 +1153,11 @@ window.onload = function(event) {
                     sessionStorage.setItem('token', JSON.parse(result).token);
                 }
                 loginSrvResponse.className = "success-msg";
-                loginSrvResponse.innerHTML = "Login succesfull!";
+                if (localStorage.getItem("lang") == "ro") {
+                    loginSrvResponse.innerHTML = "Logare reușită!";
+                } else {
+                    loginSrvResponse.innerHTML = "Login succesfull!";
+                }
                 setTimeout(function() {
                     loginSrvResponse.className = "hide";
                     login();
