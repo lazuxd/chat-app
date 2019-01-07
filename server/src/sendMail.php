@@ -14,6 +14,7 @@ $root = realpath($_SERVER["DOCUMENT_ROOT"]);
 
 //Load dependencies from composer
 //If this causes an error, run 'composer install'
+// !!! This path should be updated to the vendor/autoload.php file of this project
 require "$root/html/vendor/autoload.php";
 
 function sendMail($fromEmail, $fromName, $toEmails, $subject, $htmlBody) {

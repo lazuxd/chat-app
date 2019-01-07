@@ -23,7 +23,7 @@
             ':pwd' => $password,
             ':dName' => $displayName,
             ':active' => $active,
-            ':imgURL' => "../server/images/profileImages/$userId/profile.png"
+            ':imgURL' => "../server/images/profileImages/profile.png"
         ));
 
         $stmt->closeCursor();

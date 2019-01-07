@@ -413,7 +413,7 @@ window.onload = function(event) {
         if (chatSocket && typeof chatSocket === "object") {
             chatSocket.close();
         } 
-        chatSocket = new WebSocket('ws://localhost:8080/chat');
+        chatSocket = new WebSocket('ws://localhost:8080/');
         chatSocket.onopen = function(event) {
             chatSocket.send(JSON.stringify({
                 type: "open",
@@ -476,7 +476,9 @@ window.onload = function(event) {
                 var list = document.querySelector("#conv-ul");
                 list.innerHTML = "";
                 if (convList.GroupsConv.length === 0 && convList.PrivateConv.length === 0) {
-                    append(list, "<p style='margin-left: 30px'>Nu există convorbiri.</p>");
+                    append(list, "<p style='margin-left: 30px'>"+
+                    (localStorage.getItem("lang") === "ro" ? "Nu există convorbiri." : "There are no conversations yet.")
+                    +"</p>");
                 } else {
                     for (var conv of convList.GroupsConv) {
                         var li =
@@ -782,6 +784,10 @@ window.onload = function(event) {
     })();
 
     setLanguage(localStorage.getItem("lang"));
+    if (localStorage.getItem("lang") === "ro") {
+        document.querySelector("#en-lang-btn").classList.remove("active-lang");
+        document.querySelector("#ro-lang-btn").classList.add("active-lang");
+    }
     setAppColor(localStorage.getItem("app-color"));
     
     document.querySelector("#en-lang-btn").onclick = function() {
@@ -1111,6 +1117,7 @@ window.onload = function(event) {
                 password: signupPwdInput.value
             },
             function(result) {
+		console.log(result);
                 srvResponse.className = "success-msg";
                 if (localStorage.getItem("lang") == "ro") {
                     srvResponse.innerHTML = "Cont creat cu succes! A fost trimis un email de activare către dvs.";
