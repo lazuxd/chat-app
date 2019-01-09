@@ -12,13 +12,10 @@ require_once("checkToken.php");
 class Chat implements MessageComponentInterface {
     protected $conversations;
     protected $userIds;
-    protected $db;
 
     public function __construct() {
         $this->conversations = [];
         $this->connInfo = [];
-        $this->db = new \PDO("mysql:dbname=ChatApp;host=localhost", username, password);
-        $this->db->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
     }
 
     public function onOpen(ConnectionInterface $conn) {
@@ -38,7 +35,9 @@ class Chat implements MessageComponentInterface {
                 $this->conversations[$data->convId]->attach($from);
                 try {
                     $userId = \checkToken($data->token, true);
-                    $stmt = $this->db->prepare("SELECT DisplayName FROM Users WHERE UserID = :userId;");
+                    $db = new \PDO("mysql:dbname=ChatApp;host=localhost", username, password);
+                    $db->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+                    $stmt = $db->prepare("SELECT DisplayName FROM Users WHERE UserID = :userId;");
                     if (!$stmt->execute([":userId" => $userId])) {
                         throw new Exception("Could not execute query.");
                     } else if (!($row = $stmt->fetch())) {
@@ -59,10 +58,12 @@ class Chat implements MessageComponentInterface {
                 try {
                     $userId = checkToken($data->token, true);
                     $convId = $this->connInfo[$from->resourceId]["convId"];
-                    $stmt = $this->db->prepare("INSERT INTO Messages (Message, ConvID, UserID) VALUES (:msg, :convId, :userId);");
+                    $db = new \PDO("mysql:dbname=ChatApp;host=localhost", username, password);
+                    $db->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+                    $stmt = $db->prepare("INSERT INTO Messages (Message, ConvID, UserID) VALUES (:msg, :convId, :userId);");
                     if (!$stmt->execute([":msg" => $data->msg, ":convId" => $convId, ":userId" => $userId])) {
                         throw new Exception("Could not execute query.");
-                    } else if (!($msgId = $this->db->lastInsertId())) {
+                    } else if (!($msgId = $db->lastInsertId())) {
                         throw new Exception("Could not fetch data.");
                     } else {
                         $dataToSend = [
@@ -90,12 +91,16 @@ class Chat implements MessageComponentInterface {
     }
     public function onClose(ConnectionInterface $conn) {
         $convId = $this->connInfo[$conn->resourceId]["convId"];
-        $this->conversations[$convId]->detach($conn);
+        if ($convId && $this->conversations[$convId]) {
+            $this->conversations[$convId]->detach($conn);
+        }
         unset($this->connInfo[$conn->resourceId]);
     }
     public function onError(ConnectionInterface $conn, \Exception $e) {
         $convId = $this->connInfo[$conn->resourceId]["convId"];
-        $this->conversations[$convId]->detach($conn);
+        if ($convId && $this->conversations[$convId]) {
+            $this->conversations[$convId]->detach($conn);
+        }
         unset($this->connInfo[$conn->resourceId]);
         $conn->close();
     }
